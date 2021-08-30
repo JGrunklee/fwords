@@ -1,0 +1,7 @@
+# .gitignore for fwords
+
+# Visual Studio build outputs
+**/obj/
+**/bin/
+**/.vs/
+**/.idea/
