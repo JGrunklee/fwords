@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Puzzle.fs" />
     <Compile Include="Users.fs" />
-    <Compile Include="Library.fs" />
   </ItemGroup>
 
   <ItemGroup>
