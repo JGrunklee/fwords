@@ -7,7 +7,7 @@ module Sample =
     open fwords.Core
 
     // Puzzle 36 in "Crosswords". Intentionally missing last 3 rows
-    let myPuzzle = { answer = array2D [
+    let myPuzzle = { cells = array2D [
         ['S'; 'E'; 'D'; 'G'; 'E'; '#'; 'A'; 'F'; 'O'; 'R'; '#'; 'H'; 'O'; 'L'; 'Y']
         ['O'; 'N'; 'E'; 'O'; 'R'; '#'; 'N'; 'O'; 'R'; 'A'; '#'; 'A'; 'L'; 'E'; 'E']
         ['A'; 'I'; 'R'; 'C'; 'O'; 'N'; 'D'; 'I'; 'T'; 'I'; 'O'; 'N'; 'I'; 'N'; 'G']
@@ -23,7 +23,7 @@ module Sample =
     ]}
 
     // This blank puzzle has 6 rows and 5 columns
-    let blankPuzzle = { answer = array2D [
+    let blankPuzzle = { cells = array2D [
         [for i in 0..4 -> Puzzle.EMPTY_CHAR]
         [for i in 0..4 -> Puzzle.EMPTY_CHAR]
         [for i in 0..4 -> Puzzle.EMPTY_CHAR]
@@ -33,12 +33,12 @@ module Sample =
     ]}
 
     [<Tests>]
-    let tests =
+    let puzzleTests =
         testList "Puzzle Tests" [
             testCase "generateBlank - order of parameters" <| fun _ -> 
                 let blanky = Puzzle.generateBlank 6 5
-                Expect.equal (Array2D.length1 blanky.answer) (Array2D.length1 blankPuzzle.answer) "There should be 6 rows."
-                Expect.equal (Array2D.length2 blanky.answer) (Array2D.length2 blankPuzzle.answer) "There should be 5 columns."
+                Expect.equal (Array2D.length1 blanky.cells) (Array2D.length1 blankPuzzle.cells) "There should be 6 rows."
+                Expect.equal (Array2D.length2 blanky.cells) (Array2D.length2 blankPuzzle.cells) "There should be 5 columns."
 
             // Get/set 
             testCase "getCell - order of parameters" <| fun _ ->
@@ -53,8 +53,10 @@ module Sample =
                 let tPuzzle = Puzzle.setCell myPuzzle 10 14 'Q'
                 Expect.equal (Puzzle.getCell tPuzzle 10 14) 'Q' "Set a cell."
             testCase "setCell - out of bounds" <| fun _ -> 
-                let tPuzzle = Puzzle.setCell myPuzzle -1 -1 'Z'
-                Expect.equal (Puzzle.getCell tPuzzle -1 -1) 'Z' "This cell is out of bounds."
+                let setCellOob = fun () -> 
+                    let dontReturnThis = Puzzle.setCell myPuzzle -1 -1 'Z'
+                    ()
+                Expect.throws setCellOob "This cell is out of bounds."
             testCase "checkCell" <| fun _ -> 
                 Expect.isTrue (Puzzle.checkCell myPuzzle 5 13 'C') "A correct guess."
                 Expect.isFalse (Puzzle.checkCell myPuzzle 0 0 'X') "An incorrect guess."
@@ -86,4 +88,48 @@ module Sample =
                 Expect.equal (Puzzle.getDownClueIndex myPuzzle 5 5) 13 "Index should be 13."
             testCase "getDownClueIndex - nth row non-anchor pt 2" <| fun _ ->
                 Expect.equal (Puzzle.getDownClueIndex myPuzzle 9 0) 22 "Index should be 22."
+
+            // Operations with 2 puzzles
+            testCase "deleteMistakes" <| fun _ -> 
+                let myCopy0 = {cells = myPuzzle.cells}
+                let myCopy1 = Puzzle.setCell myCopy0 0 0 'Q'
+                let myCopy2 = Puzzle.setCell myCopy1 11 4 'Q'
+                let myCopy3 = Puzzle.setCell myCopy2 10 13 'Q'
+                let corrected = Puzzle.deleteMistakes myPuzzle myCopy3
+                Expect.isTrue (
+                    (Puzzle.checkCell corrected 0 0 Puzzle.EMPTY_CHAR) && 
+                    (Puzzle.checkCell corrected 11 4 Puzzle.EMPTY_CHAR) && 
+                    (Puzzle.checkCell corrected 10 13 Puzzle.EMPTY_CHAR))
+                    "All the cells we set should be empty in the corrected Puzzle."
+
+            testCase "computeProgress (completed Puzzle)" <| fun _ -> 
+                Expect.equal (Puzzle.computeProgress myPuzzle myPuzzle) 1.0 "myPuzzle is 100% complete compared to itself."
+
+            testCase "computeProgress 1" <| fun _ -> 
+                let myCopy0 = {cells = myPuzzle.cells}
+                let myCopy1 = Puzzle.setCell myCopy0 0 0 'Q'
+                let myCopy2 = Puzzle.setCell myCopy1 11 4 'Q'
+                let myCopy3 = Puzzle.setCell myCopy2 10 13 'Q'
+                Expect.equal (Puzzle.computeProgress myPuzzle myCopy3) (143.0/146.0) "Progress when 3 cells are erased."
+
+            testCase "computeProgress 2" <| fun _ -> 
+                let myCopy0 = {cells = myPuzzle.cells}
+                let myCopy1 = Puzzle.setCell myCopy0 0 0 'Q'
+                let myCopy2 = Puzzle.setCell myCopy1 11 4 'Q'
+                let myCopy3 = Puzzle.setCell myCopy2 10 13 'Q'
+                let myCopy4 = Puzzle.setCell myCopy3 2 2 'Q'
+                Expect.equal (Puzzle.computeProgress myPuzzle myCopy4) (142.0/146.0) "Progress when 4 cells are erased."
+        ]
+
+    [<Tests>]
+    let solutionTests = 
+        testList "Solution Tests" [
+            testCase "generateBlank" <| fun _ ->
+                let empty = Solution.generateBlank myPuzzle
+                let blankCount = Array2D.sumBy (fun letter -> if letter=Puzzle.EMPTY_CHAR then 1 else 0) empty.puzzle.cells
+                Expect.equal blankCount 146 "Make sure there are the right number of empty cells."
+
+            testCase "Puzzle computeProgress (empty Solution)" <| fun _ -> 
+                let empty = Solution.generateBlank myPuzzle
+                Expect.equal (Puzzle.computeProgress myPuzzle empty.puzzle) 0.0 "a blank puzzle is 0% complete."
         ]
