@@ -39,5 +39,10 @@ module Library =
                     Button.onClick (fun _ -> dispatch ToLobby)
                     Button.content "back"
                 ]
+                Button.create [
+                    Button.dock Dock.Top
+                    Button.onClick (fun _ -> dispatch (ToPuzzle 0))
+                    Button.content "Go To Puzzle"
+                ]
             ]
         ]
