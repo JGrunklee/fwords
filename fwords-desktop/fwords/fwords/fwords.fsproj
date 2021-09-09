@@ -7,8 +7,8 @@
 
     <ItemGroup>
         <Compile Include="UserProfiles.fs" />
-        <Compile Include="TreeViewPage.fs" />
-        <Compile Include="About.fs" />
+        <Compile Include="Library.fs" />
+        <Compile Include="Lobby.fs" />
         <Compile Include="Shell.fs" />
         <Compile Include="Program.fs" />
         <AvaloniaResource Include="**\*.xaml" />

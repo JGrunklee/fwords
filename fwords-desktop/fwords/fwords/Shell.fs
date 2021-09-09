@@ -15,51 +15,77 @@ module Shell =
     open Avalonia.FuncUI.Components.Hosts
     open Avalonia.FuncUI.DSL
     open Avalonia.FuncUI.Elmish
+    open Avalonia.Layout
 
-    type State =
-        { aboutState: About.State }
+    /// union of available views
+    type views = 
+        | LobbyView
+        | LibraryView
+
+    type State = {
+        currentView: views
+        lobbyState: Lobby.State
+        libraryState: Library.State
+    }
 
     type Msg =
-        | AboutMsg of About.Msg
+        | LobbyMsg of Lobby.Msg
+        | LibraryMsg of Library.Msg
 
     let init =
-        let aboutState, bpCmd = About.init
-        { aboutState = aboutState },
+        let lobbyState, lbyCmd = Lobby.init
+        let libraryState, libCmd = Library.init
+        {
+            currentView = LobbyView
+            lobbyState = lobbyState
+            libraryState = libraryState
+        },
         /// If your children controls don't emit any commands
         /// in the init function, you can just return Cmd.none
         /// otherwise, you can use a batch operation on all of them
         /// you can add more init commands as you need
-        Cmd.batch [ bpCmd ]
+        Cmd.batch [ lbyCmd; libCmd ]
 
     let update (msg: Msg) (state: State): State * Cmd<_> =
+        // Call child update(s)
         match msg with
-        | AboutMsg bpmsg ->
-            let aboutState, cmd =
-                About.update bpmsg state.aboutState
-            { state with aboutState = aboutState },
-            /// map the message to the kind of message 
-            /// your child control needs to handle
-            Cmd.map AboutMsg cmd
+        | LobbyMsg lbyMsg ->
+            let newLbyState, cmd =
+                Lobby.update lbyMsg state.lobbyState
+            let nextView = 
+                if lbyMsg = Lobby.ToLibrary then LibraryView
+                else state.currentView
+            { state with 
+                currentView = nextView
+                lobbyState = newLbyState
+            }, Cmd.map LobbyMsg cmd // map the message to LobbyMsg
+            
+        | LibraryMsg libMsg -> 
+            let newLibState, cmd = 
+                Library.update libMsg state.libraryState
+            let nextView = 
+                if libMsg = Library.ToLobby then LobbyView
+                else state.currentView
+            { state with 
+                currentView = nextView
+                libraryState = newLibState
+            }, Cmd.map LibraryMsg cmd // map the message to LibraryMsg
 
     let view (state: State) (dispatch) =
-        DockPanel.create
-            [ DockPanel.children
-                [ TabControl.create
-                    [ TabControl.tabStripPlacement Dock.Top
-                      TabControl.viewItems
-                          [ TabItem.create
-                                [ TabItem.header "TreeView Page"
-                                  /// If you don't need to be aware of the child control's state
-                                  /// you can use the ViewBuilder to create the Host element and render it
-                                  TabItem.content (ViewBuilder.Create<TreeViewPage.Host>([])) ]
-                            TabItem.create
-                                [ TabItem.header "User Profiles Page"
-                                  TabItem.content (ViewBuilder.Create<UserProfiles.Host>([])) ]
-                            TabItem.create
-                                [ TabItem.header "About"
-                                  /// Use your child control's view function to render it, also don't forget to compose
-                                  /// your dispatch function so it can handle the child control's message
-                                  TabItem.content (About.view state.aboutState (AboutMsg >> dispatch)) ] ] ] ] ]
+        DockPanel.create [
+            DockPanel.verticalAlignment VerticalAlignment.Center
+            DockPanel.children [
+                StackPanel.create [
+                    StackPanel.children [
+                        match state.currentView with
+                        | LobbyView -> (Lobby.view state.lobbyState (LobbyMsg >> dispatch))
+                        | LibraryView -> (Library.view state.libraryState (LibraryMsg >> dispatch))
+                    ]
+                        
+                ]
+            ]
+        ]
+                
 
     /// This is the main window of your application
     /// you can do all sort of useful things here like setting heights and widths
