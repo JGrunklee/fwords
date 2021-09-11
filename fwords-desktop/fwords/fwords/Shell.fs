@@ -17,61 +17,48 @@ module Shell =
     open Avalonia.FuncUI.Elmish
     open Avalonia.Layout
 
-    /// union of available views
-    type views = 
-        | LobbyView
-        | LibraryView
-
     type State = {
-        currentView: views
+        currentView: View
         lobbyState: Lobby.State
         libraryState: Library.State
+        solverState: Solver.State
     }
-
-    type Msg =
-        | LobbyMsg of Lobby.Msg
-        | LibraryMsg of Library.Msg
 
     let init =
         let lobbyState, lbyCmd = Lobby.init
         let libraryState, libCmd = Library.init
+        let solverState, slvCmd = Solver.init None None
         {
             currentView = LobbyView
             lobbyState = lobbyState
             libraryState = libraryState
+            solverState = solverState
         },
         /// If your children controls don't emit any commands
         /// in the init function, you can just return Cmd.none
         /// otherwise, you can use a batch operation on all of them
         /// you can add more init commands as you need
-        Cmd.batch [ lbyCmd; libCmd ]
+        Cmd.batch [ lbyCmd; libCmd; slvCmd ]
 
-    let update (msg: Msg) (state: State): State * Cmd<_> =
+    let update (msg: ShellMsg) (state: State): State * Cmd<_> =
         // Call child update(s)
         match msg with
+        | SetView view ->
+            { state with currentView = view }, Cmd.none
         | LobbyMsg lbyMsg ->
             let newLbyState, cmd =
                 Lobby.update lbyMsg state.lobbyState
-            let nextView = 
-                if lbyMsg = Lobby.ToLibrary then LibraryView
-                else state.currentView
-            { state with 
-                currentView = nextView
-                lobbyState = newLbyState
-            }, Cmd.map LobbyMsg cmd // map the message to LobbyMsg
-            
+            { state with lobbyState = newLbyState }, cmd // map the message to LobbyMsg
         | LibraryMsg libMsg -> 
             let newLibState, cmd = 
                 Library.update libMsg state.libraryState
-            let nextView = 
-                if libMsg = Library.ToLobby then LobbyView
-                else state.currentView
-            { state with 
-                currentView = nextView
-                libraryState = newLibState
-            }, Cmd.map LibraryMsg cmd // map the message to LibraryMsg
+            { state with libraryState = newLibState }, cmd // map the message to LibraryMsg
+        | SolverMsg slvMsg -> 
+            let newSlvState, cmd = 
+                Solver.update slvMsg state.solverState
+            { state with solverState = newSlvState}, cmd
 
-    let view (state: State) (dispatch) =
+    let view (state: State) (dispatch: ShellMsg -> unit) =
         DockPanel.create [
             DockPanel.verticalAlignment VerticalAlignment.Center
             DockPanel.children [
@@ -80,6 +67,7 @@ module Shell =
                         match state.currentView with
                         | LobbyView -> (Lobby.view state.lobbyState (LobbyMsg >> dispatch))
                         | LibraryView -> (Library.view state.libraryState (LibraryMsg >> dispatch))
+                        | SolverView -> (Solver.view state.solverState (SolverMsg >> dispatch))
                     ]
                         
                 ]

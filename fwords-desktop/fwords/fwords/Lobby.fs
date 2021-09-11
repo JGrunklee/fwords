@@ -10,31 +10,21 @@ module Lobby =
     open Avalonia.Media
     open Avalonia.FuncUI.DSL
 
-    type State =
-        { noop: bool } // There isn't really any state needed here
-
-    type Difficulty = 
-        | Easy
-        | Medium
-        | Hard
-
-    type Msg = 
-        | NewRandPuzzle of Difficulty
-        | ResumePuzzle
-        | ToLibrary
-        | JoinOnline
+    type State = { 
+        noop: bool
+    }
 
     let init = { noop = false }, Cmd.none
 
-    let update (msg: Msg) (state: State) =
+    let update (msg: LobbyMsg) (state: State) =
         match msg with
-        | NewRandPuzzle level -> () // Placeholder
-        | ResumePuzzle -> () // Placeholder
-        | ToLibrary -> () // Placeholder
-        | JoinOnline -> () // Placeholder
-        state, Cmd.none
+        | LobbyMsg.ToLibrary -> 
+            state, Cmd.ofMsg (ShellMsg.SetView LibraryView)
+        | NewRandPuzzle level -> state, Cmd.ofMsg (ShellMsg.LobbyMsg LobbyMsg.ToLibrary) // Placeholder
+        | ResumePuzzle -> state, Cmd.none // Placeholder
+        | JoinOnline -> state, Cmd.none // Placeholder
 
-    let view (state: State) (dispatch: Msg -> unit) =
+    let view (state: State) (dispatch: LobbyMsg -> unit) =
         DockPanel.create [ 
             DockPanel.horizontalAlignment HorizontalAlignment.Center
             DockPanel.verticalAlignment VerticalAlignment.Center
@@ -76,7 +66,7 @@ module Lobby =
                         ]
                         Button.create [
                             Button.content "Library"
-                            Button.onClick (fun _ -> dispatch ToLibrary)
+                            Button.onClick (fun _ -> dispatch LobbyMsg.ToLibrary)
                         ]
                         Button.create [
                             Button.content "Resume"

@@ -12,6 +12,11 @@ module Array2D =
         |> Seq.cast<'T>
         |> Seq.sumBy projection
 
+    let reduce (reduction: 'T->'T->'T) myarray =
+        myarray
+        |> Seq.cast<'T>
+        |> Seq.reduce reduction
+
 /// An fwords Puzzle is a 2D array of characters.
 /// It may represent a partial or complete solution to a crossword puzzle.
 type Puzzle = { cells: char[,] }
@@ -46,6 +51,12 @@ module Puzzle =
         Array2D.set q row col value
         {cells = q }
 
+    /// Get the number of rows
+    let getRows (p:Puzzle) = Array2D.length1 p.cells
+
+    /// Get the number of columns
+    let getCols (p:Puzzle) = Array2D.length2 p.cells
+
     /// Check a guess against the given cell
     /// Returns true for a correct guess
     let checkCell (p:Puzzle) row col guess : bool = 
@@ -67,7 +78,7 @@ module Puzzle =
             acc - 1
         else
             // Compute number of accross clues in entire next row above.
-            acc + (getAcrossClueIndex p (row-1) <| Array2D.length2 p.cells)
+            acc + (getAcrossClueIndex p (row-1) <| getCols p)
 
     // Count down clues 'anchored' before (left to right, top to bottom) a cell 
     let rec countDownCluesToCell (p:Puzzle) row col = 
@@ -93,7 +104,7 @@ module Puzzle =
             acc - 1
         else
             // Compute number of down clues anchored in the row above
-            let lastCol = (Array2D.length2 p.cells) - 1
+            let lastCol = (p |> getCols) - 1
             acc + (countDownCluesToCell p (row-1) lastCol)
 
     // Get the cell that 'anchors' the down clue for that cell
@@ -124,6 +135,21 @@ module Puzzle =
         let totalCount = Array2D.sumBy (fun letter -> if not (letter=FILL_CHAR) then 1 else 0) answer.cells
         float(correctCount) / float(totalCount)
 
+    /// Return true if the puzzles have the same number of rows and columns
+    /// and the same pattern of filled spaces
+    let checkSame (p:Puzzle) (q:Puzzle) : unit = 
+        if not(((getRows p)=(getRows q)) && (getCols p)=(getCols q)) then 
+            invalidArg "q" "Puzzle.checkSame: Puzzles have different dimensions."
+        else
+            let same = 
+                p.cells
+                |> Array2D.mapi (fun row col letter ->
+                    let pFilled = (letter=FILL_CHAR)
+                    let qFilled = checkCell q row col FILL_CHAR
+                    (pFilled=qFilled)) // false if there is a filled cell in one but not the other
+                |> Array2D.reduce (&&) // logical AND - we want to know if any value is false
+            if not same then invalidArg "q" "Puzzles.checkSame: Puzzles are different."
+
 /// A CluedPuzzle is a Puzzle plus a pair of clue lists
 type CluedPuzzle = {
     puzzle: Puzzle
@@ -131,6 +157,13 @@ type CluedPuzzle = {
     down: string list       // The down clues
 }
 module CluedPuzzle = 
+    /// Create an empty CluedPuzzle
+    let generateBlank rows cols : CluedPuzzle = {
+        puzzle = Puzzle.generateBlank rows cols
+        across = []
+        down = []
+    }
+
     /// Get across clue for a given cell
     let getAcrossClue (cp:CluedPuzzle) row col = 
         if cp.puzzle.cells.[row,col] = Puzzle.FILL_CHAR then

@@ -18,25 +18,19 @@ module Library =
 
     let init = { puzzles = [] }, Cmd.none
 
-    type Msg =
-        | LoadPuzzles
-        | ToLobby
-        | ToPuzzle of int // Index into the puzzzle list
-
-    let update (msg: Msg) (state: State) =
+    let update (msg: LibraryMsg) (state: State) =
         match msg with
-        | LoadPuzzles -> () // TODO
-        | ToLobby -> ()
-        | ToPuzzle index -> () // TODO
-        state, Cmd.none
+        | LoadPuzzles -> state, Cmd.none // TODO
+        | LibraryMsg.ToLobby -> state, Cmd.ofMsg (SetView LobbyView)
+        | ToPuzzle index -> state, Cmd.ofMsg (SetView SolverView)
 
-    let view (state: State) (dispatch: Msg -> unit) =
+    let view (state: State) (dispatch: LibraryMsg -> unit) =
         DockPanel.create [
             DockPanel.children [
                 // TODO: scrollable list of puzzles
                 Button.create [
                     Button.dock Dock.Bottom
-                    Button.onClick (fun _ -> dispatch ToLobby)
+                    Button.onClick (fun _ -> dispatch LibraryMsg.ToLobby)
                     Button.content "back"
                 ]
                 Button.create [
