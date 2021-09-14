@@ -89,13 +89,15 @@ module Library =
                     Grid.children [
                         Button.create [
                             Grid.column 0
-                            Button.onClick (fun _ -> dispatch LibraryMsg.ToLobby)
                             Button.content "back"
+                            Button.onClick (fun _ -> dispatch LibraryMsg.ToLobby)
+                            Button.classes ["pretty"]
                         ]
                         Button.create [
                             Grid.column 2
-                            Button.onClick (fun _ -> dispatch (ToPuzzle state.selected))
                             Button.content "Solve!"
+                            Button.onClick (fun _ -> dispatch (ToPuzzle state.selected))
+                            Button.classes ["pretty"]
                         ]
                     ]
                 ]

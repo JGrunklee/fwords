@@ -52,28 +52,34 @@ module Lobby =
                                 ]
                                 Button.create [
                                     Button.content "Easy"
+                                    Button.classes ["pretty"]
                                     Button.onClick (fun _ -> dispatch (NewRandPuzzle Easy))
                                 ]
                                 Button.create [
                                     Button.content "Medium"
+                                    Button.classes ["pretty"]
                                     Button.onClick (fun _ -> dispatch (NewRandPuzzle Medium))
                                 ]
                                 Button.create [
                                     Button.content "Hard"
+                                    Button.classes ["pretty"]
                                     Button.onClick (fun _ -> dispatch (NewRandPuzzle Hard))
                                 ]
                             ]
                         ]
                         Button.create [
                             Button.content "Library"
+                            Button.classes ["pretty"]
                             Button.onClick (fun _ -> dispatch LobbyMsg.ToLibrary)
                         ]
                         Button.create [
                             Button.content "Resume"
+                            Button.classes ["pretty"]
                             Button.onClick (fun _ -> dispatch ResumePuzzle)
                         ]
                         Button.create [
                             Button.content "Join Online"
+                            Button.classes ["pretty"]
                             Button.onClick (fun _ -> dispatch JoinOnline)
                         ]
                     ]

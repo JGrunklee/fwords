@@ -31,7 +31,7 @@ module Solver =
         | SolverMsg.ToLibrary -> state, Cmd.ofMsg (ShellMsg.SetView LibraryView)
         | SolverMsg.SelectCell (row, col) -> 
             {state with selected=row,col}, Cmd.none
-        | SolverMsg.SetCell (row,col,letter) -> { state with puzzle=CluedPuzzle.setCell state.puzzle row col letter}, Cmd.none
+        | SolverMsg.SetCell (row,col,letter) -> { state with solution=Solution.setCell state.puzzle.puzzle state.solution row col letter}, Cmd.none
 
     let cellKeyEventHandler (dispatch: SolverMsg -> unit) (keyEvt:KeyEventArgs) row col  = 
         let letter = char keyEvt.Key
@@ -39,17 +39,19 @@ module Solver =
 
     //let viewCell (state: State) (dispatch: SolverMsg -> unit) row col letter = 
     let viewCell (state:State) (dispatch: SolverMsg -> unit) row col letter = 
-        TextBlock.create [
+        Button.create [
             Grid.row row
             Grid.column col
             if letter <> Puzzle.FILL_CHAR then
-                TextBlock.text (string letter)
-                TextBlock.onPointerPressed (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
-                TextBlock.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt row col)
+                Button.classes ["cell"]
+                Button.content(string letter)
+                Button.onClick (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
+                Button.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt row col)
                 match state.selected with
-                | (r, c) -> if r=row && c=col then TextBlock.background "Orange"
+                | (r, c) -> if r=row && c=col then Button.background "Orange"
             else
-                TextBlock.background "White"
+                Button.isEnabled false
+                Button.background "White"
         ]
 
     let view (state: State) (dispatch: SolverMsg -> unit) =
@@ -116,13 +118,15 @@ module Solver =
                     Grid.children [
                         Button.create [
                             Grid.column 0
-                            Button.onClick (fun _ -> dispatch SolverMsg.ToLibrary)
                             Button.content "Library"
+                            Button.onClick (fun _ -> dispatch SolverMsg.ToLibrary)
+                            Button.classes ["pretty"]
                         ]
                         Button.create [
                             Grid.column 2
-                            Button.onClick (fun _ -> dispatch SolverMsg.ToLobby)
                             Button.content "Exit to Lobby"
+                            Button.onClick (fun _ -> dispatch SolverMsg.ToLobby)
+                            Button.classes ["pretty"]
                         ]
                     ]
                 ]
