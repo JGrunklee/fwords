@@ -21,12 +21,15 @@ module Types =
     type LibraryMsg =
         | LoadPuzzles
         | ToLobby
-        | ToPuzzle of int // Index into the puzzzle list
+        | ToPuzzle of string // Index into the puzzzle list
+        | SelectPuzzle of string 
 
-    // Messages understood by the Solver module
+    /// Messages understood by the Solver module
     type SolverMsg = 
         | ToLobby
         | ToLibrary
+        | SelectCell of int*int
+        | SetCell of int*int*char
 
     /// Available views
     type View = 

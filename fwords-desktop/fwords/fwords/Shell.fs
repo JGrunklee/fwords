@@ -17,6 +17,8 @@ module Shell =
     open Avalonia.FuncUI.Elmish
     open Avalonia.Layout
 
+    open fwords.Core
+
     type State = {
         currentView: View
         lobbyState: Lobby.State
@@ -27,7 +29,8 @@ module Shell =
     let init =
         let lobbyState, lbyCmd = Lobby.init
         let libraryState, libCmd = Library.init
-        let solverState, slvCmd = Solver.init None None
+        //let solverState, slvCmd = Solver.init None None
+        let solverState, slvCmd = Solver.init (Some SampleData.myCluedPuzzle) (Some SampleData.myEmptySolution)
         {
             currentView = LobbyView
             lobbyState = lobbyState
@@ -48,11 +51,11 @@ module Shell =
         | LobbyMsg lbyMsg ->
             let newLbyState, cmd =
                 Lobby.update lbyMsg state.lobbyState
-            { state with lobbyState = newLbyState }, cmd // map the message to LobbyMsg
+            { state with lobbyState = newLbyState }, cmd
         | LibraryMsg libMsg -> 
             let newLibState, cmd = 
                 Library.update libMsg state.libraryState
-            { state with libraryState = newLibState }, cmd // map the message to LibraryMsg
+            { state with libraryState = newLibState }, cmd
         | SolverMsg slvMsg -> 
             let newSlvState, cmd = 
                 Solver.update slvMsg state.solverState
@@ -60,20 +63,13 @@ module Shell =
 
     let view (state: State) (dispatch: ShellMsg -> unit) =
         DockPanel.create [
-            DockPanel.verticalAlignment VerticalAlignment.Center
             DockPanel.children [
-                StackPanel.create [
-                    StackPanel.children [
-                        match state.currentView with
-                        | LobbyView -> (Lobby.view state.lobbyState (LobbyMsg >> dispatch))
-                        | LibraryView -> (Library.view state.libraryState (LibraryMsg >> dispatch))
-                        | SolverView -> (Solver.view state.solverState (SolverMsg >> dispatch))
-                    ]
-                        
-                ]
+                match state.currentView with
+                | LobbyView -> (Lobby.view state.lobbyState (LobbyMsg >> dispatch))
+                | LibraryView -> (Library.view state.libraryState (LibraryMsg >> dispatch))
+                | SolverView -> (Solver.view state.solverState (SolverMsg >> dispatch))
             ]
         ]
-                
 
     /// This is the main window of your application
     /// you can do all sort of useful things here like setting heights and widths
@@ -82,7 +78,7 @@ module Shell =
     type MainWindow() as this =
         inherit HostWindow()
         do
-            base.Title <- "Quickstart"
+            base.Title <- "fwords 0.0"
             base.Width <- 800.0
             base.Height <- 600.0
             base.MinWidth <- 800.0

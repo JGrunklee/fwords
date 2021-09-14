@@ -178,6 +178,8 @@ module CluedPuzzle =
         else
             cp.down.[Puzzle.getDownClueIndex cp.puzzle row col]
 
+    let setCell (p:CluedPuzzle) row col value : CluedPuzzle = { p with puzzle = Puzzle.setCell p.puzzle row col value }        
+
 /// A Solution represents a partially-solved crossword puzzle
 type Solution = {
     puzzle: Puzzle        // The partial response
@@ -202,6 +204,13 @@ module Solution =
             puzzle = updated
             progress = (Puzzle.computeProgress p updated)
         }
+
+type PuzzleInfo = {
+    name: string
+    id: string
+    level: int // TODO make Difficulty enum visible here
+    progress: float
+}
 
 
     
