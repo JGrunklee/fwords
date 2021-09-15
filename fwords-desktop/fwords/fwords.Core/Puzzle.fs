@@ -205,12 +205,18 @@ module Solution =
             progress = (Puzzle.computeProgress p updated)
         }
 
+type Difficulty = 
+    | Easy
+    | Medium
+    | Hard
+
 type PuzzleInfo = {
     name: string
     id: string
-    level: int // TODO make Difficulty enum visible here
+    level: Difficulty
     progress: float
 }
+
 
 
     

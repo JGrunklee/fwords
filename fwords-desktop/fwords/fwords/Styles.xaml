@@ -43,4 +43,14 @@
     <Style Selector="Button.cell">
         <Setter Property="Background" Value="Transparent"/>
     </Style>
+    <Style Selector="Border">
+        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="BorderThickness" Value="1.0" />
+        <Setter Property="Padding" Value="2.0" />
+    </Style>
+    <Style Selector="TextBlock.LibraryTitles">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Thin" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
 </Styles>
