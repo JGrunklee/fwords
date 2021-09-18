@@ -2,7 +2,7 @@ namespace fwords.Core.Tests
 
 /// These are sample Unit tests that show you  briefly how you can use
 /// [Expecto](https://github.com/haf/expecto) unit test library
-module Sample =
+module PuzzleTests =
     open Expecto
     open fwords.Core
 
@@ -60,6 +60,18 @@ module Sample =
             testCase "checkCell" <| fun _ -> 
                 Expect.isTrue (Puzzle.checkCell myPuzzle 5 13 'C') "A correct guess."
                 Expect.isFalse (Puzzle.checkCell myPuzzle 0 0 'X') "An incorrect guess."
+
+            // Navigation
+            testCase "walkTo" <| fun _ ->
+                let isFillChar c = (c = Puzzle.FILL_CHAR)
+                let actual = Puzzle.walkTo myPuzzle isFillChar Direction.Rightwards 0 0
+                Expect.equal actual (Some (0,5)) "Looking for first cell that's filled"
+            testCase "getNextCell - no filled cells in the way" <| fun _ -> 
+                let nextEmpty = Puzzle.getNextCell myPuzzle Direction.Rightwards 0 0
+                Expect.equal nextEmpty (Some (0,1)) "Looking for first non-filled cell"
+            testCase "getNextCell - jumping over a filled cell" <| fun _ -> 
+                let nextEmpty = Puzzle.getNextCell myPuzzle Direction.Rightwards 0 4
+                Expect.equal nextEmpty (Some (0,6)) "Looking for first non-filled cell"
 
             // Retreiving cross clues
             testCase "getAcrossClueIndex - 0th row anchor" <| fun _ ->

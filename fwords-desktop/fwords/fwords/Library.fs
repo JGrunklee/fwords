@@ -72,7 +72,7 @@ module Library =
                         StackPanel.create [
                             StackPanel.horizontalAlignment HorizontalAlignment.Stretch
                             StackPanel.verticalAlignment VerticalAlignment.Stretch
-                            StackPanel.children [ 
+                            StackPanel.children [
                                 for item in state.puzzles do
                                     yield libraryEntry state dispatch item
                             ]

@@ -8,6 +8,7 @@ module Solver =
     open Avalonia.Controls
     open Avalonia.Layout
     open Avalonia.Input
+    open Avalonia.Interactivity
     open Avalonia.FuncUI.DSL
 
     open fwords.Core
@@ -16,26 +17,57 @@ module Solver =
         puzzle: CluedPuzzle
         solution: Solution
         selected: int*int
+        orientation: ClueOrientation
     }
 
     let init (cp:CluedPuzzle option) (s:Solution option) : (State * Cmd<_>) = 
         let myPuzzle = defaultArg cp (CluedPuzzle.generateBlank 1 1)
         let mySolution = defaultArg s (Solution.generateBlank myPuzzle.puzzle)
         Puzzle.checkSame myPuzzle.puzzle mySolution.puzzle // This may throw invalidArg
-        {puzzle=myPuzzle; solution=mySolution; selected=(-1,-1)}, Cmd.none
+        {puzzle=myPuzzle; solution=mySolution; selected=(-1,-1); orientation=Across}, Cmd.none
 
 
     let update (msg: SolverMsg) (state: State) =
         match msg with
-        | SolverMsg.ToLobby -> state, Cmd.ofMsg (ShellMsg.SetView LobbyView)
-        | SolverMsg.ToLibrary -> state, Cmd.ofMsg (ShellMsg.SetView LibraryView)
+        | SolverMsg.ToLobby -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LobbyView)
+        | SolverMsg.ToLibrary -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LibraryView)
         | SolverMsg.SelectCell (row, col) -> 
             {state with selected=row,col}, Cmd.none
-        | SolverMsg.SetCell (row,col,letter) -> { state with solution=Solution.setCell state.puzzle.puzzle state.solution row col letter}, Cmd.none
+        | SolverMsg.MoveSelection direction ->
+            let nextCell = 
+                match state.selected with 
+                | (row,col) -> 
+                    match Puzzle.getNextCell state.solution.puzzle direction row col with
+                    | Some (nrow,ncol) -> nrow,ncol
+                    | None -> row,col
+            {state with selected=nextCell}, Cmd.none
+        | SolverMsg.SetCell letter -> 
+            match state.selected with
+            | (row,col) -> 
+                let newsol = Solution.setCell state.puzzle.puzzle state.solution row col letter
+                let moveCursorMsg = 
+                    match state.orientation with
+                    | ClueOrientation.Across -> SolverMsg.MoveSelection Rightwards
+                    | ClueOrientation.Down -> SolverMsg.MoveSelection Downwards
+                    |> ShellMsg.SolverMsg
+                { state with solution=newsol}, Cmd.ofMsg moveCursorMsg
+        | ToggleOrientation -> 
+            let nexto = if state.orientation=Across then Down else Across
+            { state with orientation=nexto }, Cmd.none
 
-    let cellKeyEventHandler (dispatch: SolverMsg -> unit) (keyEvt:KeyEventArgs) row col  = 
-        let letter = char keyEvt.Key
-        if System.Char.IsLetter(letter) then (row,col,letter) |> SolverMsg.SetCell |> dispatch
+    let cellKeyEventHandler (dispatch: SolverMsg -> unit) (keyEvt:KeyEventArgs) (state:State) row col = 
+        if keyEvt.Route = RoutingStrategies.Tunnel then // For some reason we were getting both tunnel and bubble events for alpha keys
+            match keyEvt.Key with
+            | Key.Space -> dispatch SolverMsg.ToggleOrientation
+            | Key.Up -> Direction.Upwards |> SolverMsg.MoveSelection |> dispatch
+            | Key.Down -> Direction.Downwards |> SolverMsg.MoveSelection |> dispatch
+            | Key.Left -> Direction.Leftwards |> SolverMsg.MoveSelection |> dispatch
+            | Key.Right -> Direction.Rightwards |> SolverMsg.MoveSelection |> dispatch
+            | c when c >= Key.A && Key.Z >= c ->
+                let letter = char ((int c) + (int 'A') - (int Key.A)) // Convert Key code to character
+                letter |> SolverMsg.SetCell |> dispatch
+            | _ -> () // Do nothing for any other key code
+
 
     //let viewCell (state: State) (dispatch: SolverMsg -> unit) row col letter = 
     let viewCell (state:State) (dispatch: SolverMsg -> unit) row col letter = 
@@ -46,9 +78,11 @@ module Solver =
                 Button.classes ["cell"]
                 Button.content(string letter)
                 Button.onClick (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
-                Button.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt row col)
+                Button.onGotFocus (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
                 match state.selected with
-                | (r, c) -> if r=row && c=col then Button.background "Orange"
+                | (r, c) ->
+                    if r=row && c=col then 
+                        Button.background "Orange"
             else
                 Button.isEnabled false
                 Button.background "White"
@@ -106,6 +140,8 @@ module Solver =
                                     for j in 0..(cols-1) do
                                         yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle i j)
                             ]
+                            match state.selected with
+                            | (row, col) -> Grid.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt state row col)
                         ]
                     ]
                 ]

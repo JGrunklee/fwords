@@ -1,5 +1,11 @@
 namespace fwords.Core
 
+type Direction =
+    | Upwards
+    | Downwards
+    | Leftwards
+    | Rightwards
+
 // Add helpful functions to F# standard Array2D module
 module Array2D = 
     // Split a 2D array into a list of its columns
@@ -16,6 +22,7 @@ module Array2D =
         myarray
         |> Seq.cast<'T>
         |> Seq.reduce reduction
+        
 
 /// An fwords Puzzle is a 2D array of characters.
 /// It may represent a partial or complete solution to a crossword puzzle.
@@ -149,6 +156,31 @@ module Puzzle =
                     (pFilled=qFilled)) // false if there is a filled cell in one but not the other
                 |> Array2D.reduce (&&) // logical AND - we want to know if any value is false
             if not same then invalidArg "q" "Puzzles.checkSame: Puzzles are different."
+
+    let rec walkTo (p:Puzzle) predicate (d:Direction) (row:int) (col:int) : (int*int) option =
+        if p.cells.[row,col] |> predicate then Some (row,col)
+        else 
+            match d with
+            | Upwards -> if row>0 then walkTo p predicate d (row-1) col else None
+            | Leftwards -> if col>0 then walkTo p predicate d row (col-1) else None
+            | Downwards ->
+                let lastRow = (getRows p) - 1
+                if row<lastRow then walkTo p predicate d (row+1) col else None
+            | Rightwards ->
+                let lastCol = (getCols p) - 1
+                if col<lastCol then walkTo p predicate d row (col+1) else None
+        
+    let getNextCell (p:Puzzle) (d:Direction) row col : (int*int) option=
+        try
+            let predicate = fun c -> c <> FILL_CHAR
+            match d with
+            | Upwards -> walkTo p predicate d (row-1) col
+            | Leftwards -> walkTo p predicate d row (col-1)
+            | Downwards -> walkTo p predicate d (row+1) col
+            | Rightwards -> walkTo p predicate d row (col+1)
+        with
+        | _ -> None
+
 
 /// A CluedPuzzle is a Puzzle plus a pair of clue lists
 type CluedPuzzle = {
