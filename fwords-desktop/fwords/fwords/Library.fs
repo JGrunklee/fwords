@@ -9,6 +9,7 @@ module Library =
     open Avalonia.FuncUI.Components
     open Avalonia.FuncUI.Elmish
     open Elmish
+    open Avalonia.Media
 
     open fwords.Core
 
@@ -22,10 +23,10 @@ module Library =
     let init = { // Some dummy data for visualization
         selected = ""
         puzzles = [
-            {name="jeff"; id="123"; level=0; progress=0.0}
-            {name="NYT"; id="456"; level=1; progress=0.75}
-            {name="Star Tribune"; id="17"; level=2; progress=0.43}
-            {name="Jackson's book"; id="a string"; level=4; progress=0.12}
+            {name="jeff"; id="123"; level=Difficulty.Easy; progress=0.0}
+            {name="NYT"; id="456"; level=Difficulty.Easy; progress=0.75}
+            {name="Star Tribune"; id="17"; level=Difficulty.Hard; progress=0.43}
+            {name="Jackson's book"; id="a string"; level=Difficulty.Medium; progress=0.12}
                 ]}, Cmd.none
 
     let update (msg: LibraryMsg) (state: State) =
@@ -41,22 +42,38 @@ module Library =
             Grid.rowDefinitions "Auto" // One automatically-sized row
             Grid.onTapped (fun _ -> dispatch (LibraryMsg.SelectPuzzle pi.id))
             Grid.children [
-                TextBlock.create [
+                Border.create[
                     Grid.column 0
-                    TextBlock.text (
-                        if pi.id = state.selected then  pi.name + " - selected" 
-                        else pi.name )
+                    Border.classes ["LibraryTable"]
+                    Border.child(
+                        TextBlock.create [
+                            TextBlock.text (
+                                if pi.id = state.selected then  pi.name + " - selected" 
+                                else pi.name )
+                        ]
+                    )
                 ]
-                TextBlock.create [
+                Border.create[
                     Grid.column 1
-                    TextBlock.text (string pi.level)
+                    Border.classes ["LibraryTable"]
+                    Border.child(
+                        TextBlock.create [ 
+                            TextBlock.text (string pi.level)
+                        ]
+                    )
                 ]
-                TextBlock.create [
+                Border.create[
                     Grid.column 2
-                    TextBlock.text ( pi.progress
-                        |> (*) 100.0
-                        |> string
-                        |> (+) "%"
+                    Border.classes ["LibraryTable"]
+                    Border.child(
+                        TextBlock.create [
+                            TextBlock.text (
+                                (pi.progress
+                                    |> (*) 100.0
+                                    |> string)
+                                + " %"
+                            )
+                        ]
                     )
                 ]
             ]
@@ -73,6 +90,48 @@ module Library =
                             StackPanel.horizontalAlignment HorizontalAlignment.Stretch
                             StackPanel.verticalAlignment VerticalAlignment.Stretch
                             StackPanel.children [
+                                yield Grid.create [
+                                    Grid.columnDefinitions "*, *, *" // Three equally-sized columns
+                                    Grid.rowDefinitions "Auto" // One automatically-sized row
+                                    Grid.children [
+                                        Border.create[
+                                            Grid.column 0
+                                            Grid.row 0
+                                            Border.classes ["LibraryTable"]
+                                            Border.child (
+                                                TextBlock.create [
+                                                    TextBlock.text ("Puzzle Title")
+                                                    TextBlock.classes["LibraryTitles"]
+                                                    
+                                                    ]
+                                            )
+                                        ]
+                                        Border.create[
+                                            Grid.column 1
+                                            Grid.row 0
+                                            Border.classes ["LibraryTable"]
+                                            Border.child (
+                                                TextBlock.create [
+                                                    TextBlock.text ("Difficulty")
+                                                    TextBlock.classes["LibraryTitles"]
+                                                    
+                                                    ]
+                                            )
+                                        ]
+                                        Border.create[
+                                            Grid.column 2
+                                            Grid.row 0
+                                            Border.classes ["LibraryTable"]
+                                            Border.child (
+                                                TextBlock.create [
+                                                    TextBlock.text ("% Complete")
+                                                    TextBlock.classes["LibraryTitles"]
+                                                    
+                                                    ]
+                                            )
+                                        ]
+                                    ]
+                                ]
                                 for item in state.puzzles do
                                     yield libraryEntry state dispatch item
                             ]

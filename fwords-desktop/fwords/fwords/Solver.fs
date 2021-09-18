@@ -100,7 +100,6 @@ module Solver =
                     Grid.children [
                         ScrollViewer.create [
                             Grid.column 0
-                            ScrollViewer.dock Dock.Left
                             ScrollViewer.content (
                                 Grid.create [
                                     Grid.columnDefinitions "*,*"
