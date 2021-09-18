@@ -37,14 +37,14 @@ module Solver =
             let nextCell = 
                 match state.selected with 
                 | (row,col) -> 
-                    match Puzzle.getNextCell state.solution.puzzle direction row col with
+                    match Puzzle.getNextCell state.solution.puzzle direction (row,col) with
                     | Some (nrow,ncol) -> nrow,ncol
                     | None -> row,col
             {state with selected=nextCell}, Cmd.none
         | SolverMsg.SetCell letter -> 
             match state.selected with
             | (row,col) -> 
-                let newsol = Solution.setCell state.puzzle.puzzle state.solution row col letter
+                let newsol = Solution.setCell state.puzzle.puzzle state.solution (row,col) letter
                 let moveCursorMsg = 
                     match state.orientation with
                     | ClueOrientation.Across -> SolverMsg.MoveSelection Rightwards
@@ -77,7 +77,7 @@ module Solver =
             if letter <> Puzzle.FILL_CHAR then
                 Button.classes ["cell"]
                 Button.content(string letter)
-                Button.onClick (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
+                Button.onTapped (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch) // Apparently SPACE key generates a click event but not a tap event
                 Button.onGotFocus (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
                 match state.selected with
                 | (r, c) ->
@@ -137,7 +137,7 @@ module Solver =
                             Grid.children [
                                 for i in 0..(rows-1) do
                                     for j in 0..(cols-1) do
-                                        yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle i j)
+                                        yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle (i,j))
                             ]
                             match state.selected with
                             | (row, col) -> Grid.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt state row col)

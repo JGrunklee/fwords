@@ -2,7 +2,7 @@
 
 module SampleData = 
     // Puzzle 36 in "Crosswords"
-    let myPuzzle = { cells = array2D [
+    let myPuzzle = array2D [
         ['S'; 'E'; 'D'; 'G'; 'E'; '#'; 'A'; 'F'; 'O'; 'R'; '#'; 'H'; 'O'; 'L'; 'Y']
         ['O'; 'N'; 'E'; 'O'; 'R'; '#'; 'N'; 'O'; 'R'; 'A'; '#'; 'A'; 'L'; 'E'; 'E']
         ['A'; 'I'; 'R'; 'C'; 'O'; 'N'; 'D'; 'I'; 'T'; 'I'; 'O'; 'N'; 'I'; 'N'; 'G']
@@ -18,7 +18,7 @@ module SampleData =
         ['T'; 'R'; 'I'; 'P'; 'L'; 'E'; 'W'; 'O'; 'R'; 'D'; 'S'; 'C'; 'O'; 'R'; 'E']
         ['R'; 'O'; 'T'; 'E'; '#'; 'A'; 'I'; 'D'; 'A'; '#'; 'A'; 'T'; 'R'; 'E'; 'E']
         ['S'; 'O'; 'A'; 'S'; '#'; 'T'; 'E'; 'S'; 'S'; '#'; 'B'; 'A'; 'S'; 'E'; 'D']
-    ]}
+    ]
 
     let acrossClues = [
         "Riverbank plant"

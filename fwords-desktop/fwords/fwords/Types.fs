@@ -33,7 +33,7 @@ module Types =
     type SolverMsg = 
         | ToLobby
         | ToLibrary
-        | SelectCell of int*int
+        | SelectCell of Cell
         | MoveSelection of Direction
         | SetCell of char
         | ToggleOrientation
