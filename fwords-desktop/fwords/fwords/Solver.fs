@@ -29,14 +29,9 @@ module Solver =
 
     let update (msg: SolverMsg) (state: State) =
         match msg with
-<<<<<<< HEAD
-        | SolverMsg.ToLobby -> state, Cmd.ofMsg (ShellMsg.SetView LobbyView)
-        | SolverMsg.ToLibrary -> state, Cmd.ofMsg (ShellMsg.SetView LibraryView)
-        //| SolverMsg TODO
-=======
+        | SolverMsg.SetPuzzle (cp, s) -> init cp s
         | SolverMsg.ToLobby -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LobbyView)
         | SolverMsg.ToLibrary -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LibraryView)
->>>>>>> 6dac118a3f435878e18d2b663c2d2752fc38b938
         | SolverMsg.SelectCell (row, col) -> 
             {state with selected=row,col}, Cmd.none
         | SolverMsg.MoveSelection direction ->

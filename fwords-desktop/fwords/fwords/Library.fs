@@ -25,16 +25,29 @@ module Library =
         puzzles = [
             {name="jeff"; id="123"; level=Difficulty.Easy; progress=0.0}
             {name="NYT"; id="456"; level=Difficulty.Easy; progress=0.75}
-            {name="Star Tribune"; id="17"; level=Difficulty.Hard; progress=0.43}
-            {name="Jackson's book"; id="a string"; level=Difficulty.Medium; progress=0.12}
+            {name="Star Tribune"; id="start_tribune.pzl"; level=Difficulty.Hard; progress=0.43}
+            {name="Jackson's book"; id="jacksons_book.pzl"; level=Difficulty.Medium; progress=0.12}
                 ]}, Cmd.none
 
     let update (msg: LibraryMsg) (state: State) =
         match msg with
         | LoadPuzzles -> state, Cmd.none // TODO
         | LibraryMsg.ToLobby -> state, Cmd.ofMsg (SetView LobbyView)
-        | ToPuzzle index -> state, Cmd.ofMsg (SetView SolverView)
-        | SelectPuzzle id -> {state with selected = id}, Cmd.none
+        | ToPuzzle -> 
+            let selectedInfo =
+                state.puzzles
+                |> List.find (fun pi -> pi.id = state.selected)
+            let myPuzzle = 
+                // Actual version will do: PuzzleInfo.loadFromId selectedInfo.id
+                if selectedInfo.id = "123" then
+                    SampleData.myCluedPuzzle
+                else SampleDatatwo.myCluedPuzzle
+            state, Cmd.batch [
+            Cmd.ofMsg (SetView SolverView)
+            (Some(myPuzzle),None) |> SolverMsg.SetPuzzle |> ShellMsg.SolverMsg |> Cmd.ofMsg
+            ]
+        | SelectPuzzle id -> 
+            {state with selected = id}, Cmd.none
 
 
     //let puzzleSelectorHandler (dispatch: SolverMsg -> unit) TODO
@@ -49,7 +62,6 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 0
-                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [
                             TextBlock.text (
@@ -62,7 +74,6 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 1
-                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [ 
                             TextBlock.text (string pi.level)
@@ -74,7 +85,6 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 2
-                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [
                             TextBlock.text (
@@ -109,7 +119,6 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 0
                                             Grid.row 0
-                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("Puzzle Title")
@@ -122,7 +131,6 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 1
                                             Grid.row 0
-                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("Difficulty")
@@ -135,7 +143,6 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 2
                                             Grid.row 0
-                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("% Complete")
@@ -169,7 +176,7 @@ module Library =
                         Button.create [
                             Grid.column 2
                             Button.content "Solve!"
-                            Button.onClick (fun _ -> dispatch (ToPuzzle state.selected))
+                            Button.onClick (fun _ -> dispatch ToPuzzle)
                             Button.classes ["pretty"]
                         ]
                     ]

@@ -26,7 +26,7 @@ module Types =
     type LibraryMsg =
         | LoadPuzzles
         | ToLobby
-        | ToPuzzle of string // Index into the puzzzle list
+        | ToPuzzle
         | SelectPuzzle of string 
 
     /// Messages understood by the Solver module
@@ -37,6 +37,7 @@ module Types =
         | MoveSelection of Direction
         | SetCell of char
         | ToggleOrientation
+        | SetPuzzle of CluedPuzzle option * Solution option
 
     /// Available views
     type View = 
