@@ -29,6 +29,7 @@ module Solver =
         match msg with
         | SolverMsg.ToLobby -> state, Cmd.ofMsg (ShellMsg.SetView LobbyView)
         | SolverMsg.ToLibrary -> state, Cmd.ofMsg (ShellMsg.SetView LibraryView)
+        //| SolverMsg TODO
         | SolverMsg.SelectCell (row, col) -> 
             {state with selected=row,col}, Cmd.none
         | SolverMsg.SetCell (row,col,letter) -> { state with solution=Solution.setCell state.puzzle.puzzle state.solution row col letter}, Cmd.none

@@ -1,9 +1,9 @@
 ﻿namespace fwords.Core
 
-module SampleData = 
-    // Puzzle 36 in "Crosswords"
+module SampleDatatwo = 
+    // Puzzle 36 "Test" in "Crosswords"
     let myPuzzle = { cells = array2D [
-        ['S'; 'E'; 'D'; 'G'; 'E'; '#'; 'A'; 'F'; 'O'; 'R'; '#'; 'H'; 'O'; 'L'; 'Y']
+        ['T'; 'E'; 'S'; 'T'; 'E'; '#'; 'A'; 'F'; 'O'; 'R'; '#'; 'H'; 'O'; 'L'; 'Y']
         ['O'; 'N'; 'E'; 'O'; 'R'; '#'; 'N'; 'O'; 'R'; 'A'; '#'; 'A'; 'L'; 'E'; 'E']
         ['A'; 'I'; 'R'; 'C'; 'O'; 'N'; 'D'; 'I'; 'T'; 'I'; 'O'; 'N'; 'I'; 'N'; 'G']
         ['R'; 'A'; 'M'; 'A'; '#'; 'O'; 'Y'; 'E'; '#'; 'N'; 'A'; 'G'; 'N'; 'A'; 'G']
@@ -21,7 +21,7 @@ module SampleData =
     ]}
 
     let acrossClues = [
-        "Riverbank plant"
+        "Test Data"
         "Get an ___ effort: 2wds"
         "Third word of 'Silent Night'"
         "___ two (a few): 2wds"

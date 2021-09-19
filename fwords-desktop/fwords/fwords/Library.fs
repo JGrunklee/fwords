@@ -36,6 +36,9 @@ module Library =
         | ToPuzzle index -> state, Cmd.ofMsg (SetView SolverView)
         | SelectPuzzle id -> {state with selected = id}, Cmd.none
 
+
+    //let puzzleSelectorHandler (dispatch: SolverMsg -> unit) TODO
+
     let libraryEntry (state: State) (dispatch: LibraryMsg -> unit) (pi:PuzzleInfo) = 
         Grid.create [
             Grid.columnDefinitions "*, *, *" // Three equally-sized columns
@@ -43,24 +46,31 @@ module Library =
             Grid.onTapped (fun _ -> dispatch (LibraryMsg.SelectPuzzle pi.id))
             Grid.children [
                 Border.create[
+                    if pi.id = state.selected then Border.classes["Thick"]
+                    else Border.classes["Normal"]
                     Grid.column 0
                     Border.child(
                         TextBlock.create [
                             TextBlock.text (
-                                if pi.id = state.selected then  pi.name + " - selected" 
-                                else pi.name )
+                                pi.name )
+                            TextBlock.classes["Center"]
                         ]
                     )
                 ]
                 Border.create[
+                    if pi.id = state.selected then Border.classes["Thick"]
+                    else Border.classes["Normal"]
                     Grid.column 1
                     Border.child(
                         TextBlock.create [ 
                             TextBlock.text (string pi.level)
+                            TextBlock.classes["Center"]
                         ]
                     )
                 ]
                 Border.create[
+                    if pi.id = state.selected then Border.classes["Thick"]
+                    else Border.classes["Normal"]
                     Grid.column 2
                     Border.child(
                         TextBlock.create [
@@ -70,6 +80,7 @@ module Library =
                                     |> string)
                                 + " %"
                             )
+                            TextBlock.classes["Center"]
                         ]
                     )
                 ]
@@ -92,6 +103,7 @@ module Library =
                                     Grid.rowDefinitions "Auto" // One automatically-sized row
                                     Grid.children [
                                         Border.create[
+                                            Border.classes["Normal"]
                                             Grid.column 0
                                             Grid.row 0
                                             Border.child (
@@ -103,6 +115,7 @@ module Library =
                                             )
                                         ]
                                         Border.create[
+                                            Border.classes["Normal"]
                                             Grid.column 1
                                             Grid.row 0
                                             Border.child (
@@ -114,6 +127,7 @@ module Library =
                                             )
                                         ]
                                         Border.create[
+                                            Border.classes["Normal"]
                                             Grid.column 2
                                             Grid.row 0
                                             Border.child (

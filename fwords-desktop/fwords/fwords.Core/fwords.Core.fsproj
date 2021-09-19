@@ -8,6 +8,7 @@
     <Compile Include="Puzzle.fs" />
     <Compile Include="Users.fs" />
     <Compile Include="SampleData.fs" />
+    <Compile Include="SampleDatatwo.fs" />
   </ItemGroup>
 
   <ItemGroup>
