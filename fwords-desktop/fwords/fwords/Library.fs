@@ -49,6 +49,7 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 0
+                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [
                             TextBlock.text (
@@ -61,6 +62,7 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 1
+                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [ 
                             TextBlock.text (string pi.level)
@@ -72,6 +74,7 @@ module Library =
                     if pi.id = state.selected then Border.classes["Thick"]
                     else Border.classes["Normal"]
                     Grid.column 2
+                    Border.classes ["LibraryTable"]
                     Border.child(
                         TextBlock.create [
                             TextBlock.text (
@@ -106,6 +109,7 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 0
                                             Grid.row 0
+                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("Puzzle Title")
@@ -118,6 +122,7 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 1
                                             Grid.row 0
+                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("Difficulty")
@@ -130,6 +135,7 @@ module Library =
                                             Border.classes["Normal"]
                                             Grid.column 2
                                             Grid.row 0
+                                            Border.classes ["LibraryTable"]
                                             Border.child (
                                                 TextBlock.create [
                                                     TextBlock.text ("% Complete")

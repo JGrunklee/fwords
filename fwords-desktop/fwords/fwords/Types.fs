@@ -3,12 +3,17 @@
 /// Global types used by fwords
 [<AutoOpen>]
 module Types = 
+    open fwords.Core
 
     /// Define difficulty
     type Difficulty = 
         | Easy
         | Medium
         | Hard
+
+    type ClueOrientation = 
+        | Down
+        | Across
 
     /// Messages understood by Lobby module
     type LobbyMsg = 
@@ -28,8 +33,10 @@ module Types =
     type SolverMsg = 
         | ToLobby
         | ToLibrary
-        | SelectCell of int*int
-        | SetCell of int*int*char
+        | SelectCell of Cell
+        | MoveSelection of Direction
+        | SetCell of char
+        | ToggleOrientation
 
     /// Available views
     type View = 
@@ -43,3 +50,5 @@ module Types =
         | LobbyMsg of LobbyMsg
         | LibraryMsg of LibraryMsg
         | SolverMsg of SolverMsg
+
+
