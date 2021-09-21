@@ -77,13 +77,30 @@ module Solver =
             Grid.column col
             if letter <> Puzzle.FILL_CHAR then
                 Button.classes ["cell"]
-                Button.content(string letter)
                 Button.onTapped (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch) // Apparently SPACE key generates a click event but not a tap event
                 Button.onGotFocus (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
+                Button.padding 0.0
                 match state.selected with
                 | (r, c) ->
                     if r=row && c=col then 
                         Button.background "Orange"
+                Button.content(//string letter[
+                    DockPanel.create [
+                        DockPanel.children [
+                            match Puzzle.getCellNumber state.puzzle.puzzle (row,col) with
+                            | Some num -> 
+                                TextBlock.create [
+                                    TextBlock.dock Dock.Top
+                                    TextBlock.classes ["CellNumber"]
+                                    TextBlock.text (string num)
+                                ]
+                            | None -> ()
+                            TextBlock.create [
+                                TextBlock.text (string letter)
+                            ]
+                        ]
+                    ]
+                )
             else
                 Button.isEnabled false
                 Button.background "White"
@@ -99,25 +116,65 @@ module Solver =
                     Grid.columnDefinitions "*, Auto"
                     Grid.rowDefinitions "*"
                     Grid.children [
+                        // Clue Area
                         ScrollViewer.create [
                             Grid.column 0
                             ScrollViewer.content (
                                 Grid.create [
                                     Grid.columnDefinitions "*,*"
-                                    Grid.rowDefinitions "auto"
                                     Grid.children [
+                                        // Across clues
                                         StackPanel.create [
                                             Grid.column 0
                                             StackPanel.children [
-                                                for clue in state.puzzle.across do
-                                                    yield TextBlock.create [ TextBlock.text clue ]
+                                                Grid.create [
+                                                    Grid.columnDefinitions "Auto,*"
+                                                    Grid.rowDefinitions (
+                                                        [for i in 0..(state.puzzle.across.Length-1) -> "Auto"]
+                                                        |> String.concat ","
+                                                    )
+                                                    Grid.children [
+                                                        for index in 0..(state.puzzle.across.Length-1) do
+                                                            yield TextBlock.create [
+                                                                Grid.column 0
+                                                                Grid.row index
+                                                                TextBlock.text (
+                                                                    (CluedPuzzle.getClueNumber state.puzzle ClueOrientation.Across index |> string) + ". ")
+                                                            ]
+                                                            yield TextBlock.create [
+                                                                Grid.column 1
+                                                                Grid.row index
+                                                                TextBlock.text state.puzzle.across.[index]
+                                                            ]
+                                                    ]
+                                                ]
                                             ]
                                         ]
+                                        // Down clues
                                         StackPanel.create [
                                             Grid.column 1
                                             StackPanel.children [
-                                                for clue in state.puzzle.down do
-                                                    yield TextBlock.create [ TextBlock.text clue ]
+                                                Grid.create [
+                                                    Grid.columnDefinitions "Auto,*"
+                                                    Grid.rowDefinitions (
+                                                        [for i in 0..(state.puzzle.down.Length-1) -> "Auto"]
+                                                        |> String.concat ","
+                                                    )
+                                                    Grid.children [
+                                                        for index in 0..(state.puzzle.down.Length-1) do
+                                                            yield TextBlock.create [
+                                                                Grid.column 0
+                                                                Grid.row index
+                                                                TextBlock.text (
+                                                                    (CluedPuzzle.getClueNumber state.puzzle ClueOrientation.Down index |> string) + ". ")
+                                                            ]
+                                                            yield TextBlock.create [
+                                                                Grid.column 1
+                                                                Grid.row index
+                                                                TextBlock.text state.puzzle.down.[index]
+                                                            ]
+                                                    ]
+                                                ]
                                             ]
                                         ]
                                     ]
@@ -125,24 +182,61 @@ module Solver =
                             )
                         ]
                         // Puzzle area
-                        Grid.create [
-                            let rows = Puzzle.getRows state.puzzle.puzzle
-                            let cols = Puzzle.getCols state.puzzle.puzzle
-                            let rowdefs = [for i in 0..(rows-1) -> "30"] |> String.concat ","
-                            let coldefs = [for i in 0..(cols-1) -> "30"] |> String.concat ","
+                        StackPanel.create [
                             Grid.column 1
-                            Grid.dock Dock.Right
-                            Grid.horizontalAlignment HorizontalAlignment.Right 
-                            Grid.columnDefinitions coldefs
-                            Grid.rowDefinitions rowdefs
-                            Grid.children [
-                                for i in 0..(rows-1) do
-                                    for j in 0..(cols-1) do
-                                        yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle (i,j))
+                            StackPanel.children [
+                                Border.create [
+                                    Border.child (
+                                        Grid.create [
+                                            let rows = Puzzle.getRows state.puzzle.puzzle
+                                            let cols = Puzzle.getCols state.puzzle.puzzle
+                                            let rowdefs = [for i in 0..(rows-1) -> "30"] |> String.concat ","
+                                            let coldefs = [for i in 0..(cols-1) -> "30"] |> String.concat ","
+                                            Grid.column 1
+                                            Grid.dock Dock.Right
+                                            Grid.horizontalAlignment HorizontalAlignment.Right 
+                                            Grid.columnDefinitions coldefs
+                                            Grid.rowDefinitions rowdefs
+                                            Grid.children [
+                                                for i in 0..(rows-1) do
+                                                    for j in 0..(cols-1) do
+                                                        yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle (i,j))
+                                            ]
+                                            match state.selected with
+                                            | (row, col) -> Grid.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt state row col)
+                                        ]
+                                    )
+                                ]
+                                Border.create [
+                                    Border.child (
+                                        TextBlock.create [
+                                            TextBlock.text (
+                                                let getClueNumberFunction (c:Cell) = 
+                                                    match state.orientation with
+                                                    | Across -> 
+                                                        Puzzle.getAcrossClueIndex state.puzzle.puzzle c
+                                                        |> CluedPuzzle.getClueNumber state.puzzle Across
+                                                    | Down -> 
+                                                        Puzzle.getDownClueIndex state.puzzle.puzzle c
+                                                        |> CluedPuzzle.getClueNumber state.puzzle Down
+                                                let getClueFunction = 
+                                                    match state.orientation with 
+                                                    | Across -> CluedPuzzle.getAcrossClue state.puzzle
+                                                    | Down -> CluedPuzzle.getDownClue state.puzzle
+                                                try
+                                                    String.concat ". " [
+                                                        getClueNumberFunction state.selected |> string
+                                                        string state.orientation
+                                                        getClueFunction state.selected
+                                                    ]
+                                                with | _ -> ""
+                                            )
+                                        ]
+                                    )
+                                ]
                             ]
-                            match state.selected with
-                            | (row, col) -> Grid.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt state row col)
                         ]
+                        
                     ]
                 ]
                 // Navigation buttons

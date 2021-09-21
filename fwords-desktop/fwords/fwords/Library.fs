@@ -34,18 +34,20 @@ module Library =
         | LoadPuzzles -> state, Cmd.none // TODO
         | LibraryMsg.ToLobby -> state, Cmd.ofMsg (SetView LobbyView)
         | ToPuzzle -> 
-            let selectedInfo =
-                state.puzzles
-                |> List.find (fun pi -> pi.id = state.selected)
-            let myPuzzle = 
-                // Actual version will do: PuzzleInfo.loadFromId selectedInfo.id
-                if selectedInfo.id = "123" then
-                    SampleData.myCluedPuzzle
-                else SampleDatatwo.myCluedPuzzle
-            state, Cmd.batch [
-            Cmd.ofMsg (SetView SolverView)
-            (Some(myPuzzle),None) |> SolverMsg.SetPuzzle |> ShellMsg.SolverMsg |> Cmd.ofMsg
-            ]
+            try 
+                let selectedInfo =
+                    state.puzzles
+                    |> List.find (fun pi -> pi.id = state.selected) // May throw KeyNotFound if no entry selected
+                let myPuzzle = 
+                    // Actual version will do: PuzzleInfo.loadFromId selectedInfo.id
+                    if selectedInfo.id = "123" then
+                        SampleData.myCluedPuzzle
+                    else SampleDatatwo.myCluedPuzzle
+                state, Cmd.batch [
+                Cmd.ofMsg (SetView SolverView)
+                (Some(myPuzzle),None) |> SolverMsg.SetPuzzle |> ShellMsg.SolverMsg |> Cmd.ofMsg
+                ]
+            with | _ -> state, Cmd.none
         | SelectPuzzle id -> 
             {state with selected = id}, Cmd.none
 

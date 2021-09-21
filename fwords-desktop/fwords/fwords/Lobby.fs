@@ -10,6 +10,8 @@ module Lobby =
     open Avalonia.Media
     open Avalonia.FuncUI.DSL
 
+    open fwords.Core
+
     type State = { 
         noop: bool
     }

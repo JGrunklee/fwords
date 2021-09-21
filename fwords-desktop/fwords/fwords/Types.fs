@@ -5,16 +5,6 @@
 module Types = 
     open fwords.Core
 
-    /// Define difficulty
-    type Difficulty = 
-        | Easy
-        | Medium
-        | Hard
-
-    type ClueOrientation = 
-        | Down
-        | Across
-
     /// Messages understood by Lobby module
     type LobbyMsg = 
         | NewRandPuzzle of Difficulty

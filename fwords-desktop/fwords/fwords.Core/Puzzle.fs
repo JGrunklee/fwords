@@ -183,6 +183,22 @@ module Puzzle =
         | Rightwards -> row,(col+1)
         |> walkTo p predicate d 
 
+    let rec countNumberedCellsTo (p:Puzzle) (c:Cell) : int =
+        let acc = if checkCell p c FILL_CHAR then 0 else 1
+        match c with 
+        | (0,0) -> acc
+        | (0,col) -> (0,col-1) |> countNumberedCellsTo p |> (+) acc
+        | (row,0) -> (row-1, (getCols p)-1) |> countNumberedCellsTo p |> (+) acc
+        | (row,col) when checkCell p (row-1,col) FILL_CHAR || checkCell p (row,col-1) FILL_CHAR ->
+            (row, col-1) |> countNumberedCellsTo p |> (+) acc
+        | (row,col) -> (row,col-1) |> countNumberedCellsTo p // DON'T add because this cell has no number
+
+    let getCellNumber (p:Puzzle) (c:Cell) : int option = 
+        let row,col = c
+        if row<>0 && col<>0 
+            && not (checkCell p (row-1,col) FILL_CHAR || checkCell p (row,col-1) FILL_CHAR) then None
+        else Some (countNumberedCellsTo p c)
+        
 /// Functions that operate on CluedPuzzles
 module CluedPuzzle = 
     /// Create an empty CluedPuzzle
@@ -207,6 +223,24 @@ module CluedPuzzle =
             cp.down.[Puzzle.getDownClueIndex cp.puzzle c]
 
     let setCell (cp:CluedPuzzle) (c:Cell) value : CluedPuzzle = { cp with puzzle = Puzzle.setCell cp.puzzle c value }        
+
+    let getClueNumber (cp:CluedPuzzle) (orientation:ClueOrientation) (index:int) : int =
+        let rec loop (c:Cell) = 
+            let row,col = c
+            if row >= (Puzzle.getCols cp.puzzle) then -1
+            elif col >= (Puzzle.getCols cp.puzzle) then loop (row+1,0)
+            else
+                match Puzzle.getCellNumber cp.puzzle c with
+                | None -> loop (row,col+1)
+                | Some number -> 
+                    match orientation with
+                    | Across -> 
+                        if Puzzle.getAcrossClueIndex cp.puzzle (row,col) = index then number
+                        else loop (row,col+1)
+                    | Down ->
+                        if Puzzle.getDownClueIndex cp.puzzle (row,col) = index then number
+                        else loop (row,col+1)
+        loop (0,0)
 
 /// Functions that operate on Solutions
 module Solution = 

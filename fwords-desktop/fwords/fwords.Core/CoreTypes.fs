@@ -5,6 +5,9 @@ module FwordsCoreTypes =
     /// Enumerate the directions that we might want to move through Puzzles
     type Direction = | Upwards | Downwards | Leftwards | Rightwards
 
+    /// Enumerate the orientations that clues can have
+    type ClueOrientation = | Down | Across
+
     /// Enumerate some levels of difficulty
     type Difficulty = | Easy | Medium | Hard
 
