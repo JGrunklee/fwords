@@ -44,8 +44,8 @@ module Library =
                         SampleData.myCluedPuzzle
                     else SampleDatatwo.myCluedPuzzle
                 state, Cmd.batch [
-                Cmd.ofMsg (SetView SolverView)
                 (Some(myPuzzle),None) |> SolverMsg.SetPuzzle |> ShellMsg.SolverMsg |> Cmd.ofMsg
+                Cmd.ofMsg (SetView SolverView)
                 ]
             with | _ -> state, Cmd.none
         | SelectPuzzle id -> 
@@ -179,6 +179,7 @@ module Library =
                             Grid.column 2
                             Button.content "Solve!"
                             Button.onClick (fun _ -> dispatch ToPuzzle)
+                            Button.isEnabled (state.selected <> "")
                             Button.classes ["pretty"]
                         ]
                     ]

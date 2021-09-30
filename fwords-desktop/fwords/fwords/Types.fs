@@ -17,7 +17,7 @@ module Types =
         | LoadPuzzles
         | ToLobby
         | ToPuzzle
-        | SelectPuzzle of string 
+        | SelectPuzzle of string
 
     /// Messages understood by the Solver module
     type SolverMsg = 
@@ -26,6 +26,7 @@ module Types =
         | SelectCell of Cell
         | MoveSelection of Direction
         | SetCell of char
+        | ClearCell
         | ToggleOrientation
         | SetPuzzle of CluedPuzzle option * Solution option
 

@@ -242,6 +242,25 @@ module CluedPuzzle =
                         else loop (row,col+1)
         loop (0,0)
 
+    let getFormalClue (cp:CluedPuzzle) (c:Cell) (o:ClueOrientation) : string = 
+        try
+            let clueNumStr = 
+                match o with
+                | Across -> 
+                    Puzzle.getAcrossClueIndex cp.puzzle c
+                    |> getClueNumber cp Across
+                    |> string
+                | Down -> 
+                    Puzzle.getDownClueIndex cp.puzzle c
+                    |> getClueNumber cp Down
+                    |> string
+            let clueStr = 
+                match o with 
+                | Across -> getAcrossClue cp c
+                | Down -> getDownClue cp c 
+            clueNumStr + " " + (string o) + ": " + clueStr 
+        with | _ -> "" // Return an empty string. This might happen if an invalid cell is selected
+
 /// Functions that operate on Solutions
 module Solution = 
     /// Create a brand new (empty) solution
