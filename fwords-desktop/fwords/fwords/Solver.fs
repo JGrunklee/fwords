@@ -20,14 +20,14 @@ module Solver =
         solution: Solution
         selected: Cell
         orientation: ClueOrientation
+        highlighted: Cell list
     }
 
     let init (cp:CluedPuzzle option) (s:Solution option) : (State * Cmd<_>) = 
         let myPuzzle = defaultArg cp (CluedPuzzle.generateBlank 1 1)
         let mySolution = defaultArg s (Solution.generateBlank myPuzzle.puzzle)
         Puzzle.checkSame myPuzzle.puzzle mySolution.puzzle // This may throw invalidArg
-        {puzzle=myPuzzle; solution=mySolution; selected=(-1,-1); orientation=Across}, Cmd.none
-
+        {puzzle=myPuzzle; solution=mySolution; selected=(-1,-1); orientation=Across; highlighted=[]}, Cmd.none
 
     let update (msg: SolverMsg) (state: State) =
         match msg with
@@ -35,7 +35,12 @@ module Solver =
         | SolverMsg.ToLobby -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LobbyView)
         | SolverMsg.ToLibrary -> {state with selected=(-1,-1)}, Cmd.ofMsg (ShellMsg.SetView LibraryView)
         | SolverMsg.SelectCell (row, col) -> 
-            {state with selected=row,col}, Cmd.none
+            if (row,col) = state.selected then state, ToggleOrientation |> ShellMsg.SolverMsg |> Cmd.ofMsg
+            else
+                { state with 
+                    selected=row,col
+                    highlighted = Puzzle.calcHighlights state.puzzle.puzzle (row,col) state.orientation
+                }, Cmd.none
         | SolverMsg.MoveSelection direction ->
             let nextCell = 
                 match state.selected with 
@@ -43,7 +48,7 @@ module Solver =
                     match Puzzle.getNextCell state.solution.puzzle direction (row,col) with
                     | Some (nrow,ncol) -> nrow,ncol
                     | None -> row,col
-            {state with selected=nextCell}, Cmd.none
+            state, nextCell |> SolverMsg.SelectCell |> ShellMsg.SolverMsg |> Cmd.ofMsg 
         | SolverMsg.SetCell letter -> 
             match state.selected with
             | (row,col) -> 
@@ -60,7 +65,10 @@ module Solver =
             { state with solution = newsol }, Cmd.none
         | ToggleOrientation -> 
             let nexto = if state.orientation=Across then Down else Across
-            { state with orientation=nexto }, Cmd.none
+            { state with 
+                orientation=nexto
+                highlighted = Puzzle.calcHighlights state.puzzle.puzzle state.selected nexto
+            }, Cmd.none
 
     let cellKeyEventHandler (dispatch: SolverMsg -> unit) (keyEvt:KeyEventArgs) = 
         if keyEvt.Route = RoutingStrategies.Tunnel then // For some reason we were getting both tunnel and bubble events for alpha keys
@@ -91,6 +99,7 @@ module Solver =
 
                 let r,c = state.selected
                 if r=row && c=col then Button.background "Orange"
+                elif List.contains (row,col) state.highlighted then Button.background "Pink"
                 Button.content(
                     DockPanel.create [
                         DockPanel.children [
@@ -121,13 +130,14 @@ module Solver =
             Grid.children [
                 TextBlock.create [ // Clue number
                     Grid.column 0
-                    TextBlock.classes ["ClueNumber"]
+                    TextBlock.classes ["Clue"; "ClueNumber"]
                     TextBlock.text (
                         (CluedPuzzle.getClueNumber state.puzzle o index |> string) + ". "
                     )
                 ]
                 TextBlock.create [ // Clue text
                     Grid.column 1
+                    TextBlock.classes ["Clue"]
                     TextBlock.textWrapping TextWrapping.Wrap
                     TextBlock.text (
                         match o with
@@ -182,26 +192,27 @@ module Solver =
                         ]
                     ]
                 ]
-                Grid.create [
+                Grid.create [ // This grid separates the clues from the puzzle
                     Grid.rowDefinitions "*"
-                    Grid.columnDefinitions "*,Auto"
+                    Grid.columnDefinitions "2*,*"
                     Grid.children [
                         // Puzzle Area
-                        Grid.create [
+                        Grid.create [ // This grid centers the puzzle within the available space
                             Grid.column 0
                             Grid.columnDefinitions "*,Auto,*"
                             Grid.rowDefinitions "*,Auto,*"
+                            Grid.margin 10.0
                             Grid.children [
                                 StackPanel.create [
                                     Grid.row 1
                                     Grid.column 1
                                     StackPanel.children [
-                                        Grid.create [
+                                        Grid.create [ // This grid is the actual puzzle
                                             Grid.dock Dock.Right
                                             let rows = Puzzle.getRows state.puzzle.puzzle
                                             let cols = Puzzle.getCols state.puzzle.puzzle
-                                            Grid.columnDefinitions ([for i in 0..(cols-1) -> "35"] |> String.concat ",")
-                                            Grid.rowDefinitions ([for i in 0..(rows-1) -> "35"] |> String.concat ",")
+                                            Grid.columnDefinitions ([for i in 0..(cols-1) -> "33"] |> String.concat ",")
+                                            Grid.rowDefinitions ([for i in 0..(rows-1) -> "33"] |> String.concat ",")
                                             Grid.children [
                                                 for i in 0..(rows-1) do
                                                     for j in 0..(cols-1) do
@@ -211,11 +222,10 @@ module Solver =
                                     ]
                                 ]
                             ]
-                        ]  
+                        ]
                         // Clue Area
-                        ScrollViewer.create [ // TODO: Need a way to compress this horizontally - right now it is screwing up the resize behavior
+                        ScrollViewer.create [
                             Grid.column 1
-                            ScrollViewer.horizontalAlignment HorizontalAlignment.Left
                             ScrollViewer.content (
                                 Grid.create [
                                     Grid.columnDefinitions "*,*"
@@ -226,6 +236,7 @@ module Solver =
                                             StackPanel.children [
                                                 yield TextBlock.create [
                                                     TextBlock.text "Across"
+                                                    TextBlock.classes ["subtitle"]
                                                 ]
                                                 for index in [0..(state.puzzle.across.Length-1)] do
                                                     yield viewClue state dispatch Across index
@@ -236,6 +247,7 @@ module Solver =
                                             StackPanel.children [
                                                 yield TextBlock.create [
                                                     TextBlock.text "Down"
+                                                    TextBlock.classes ["subtitle"]
                                                 ]
                                                 for index in [0..(state.puzzle.down.Length-1)] do
                                                     yield viewClue state dispatch Down index
@@ -244,7 +256,7 @@ module Solver =
                                     ]
                                 ]
                             )
-                        ]      
+                        ]
                     ]
                 ]
             ]

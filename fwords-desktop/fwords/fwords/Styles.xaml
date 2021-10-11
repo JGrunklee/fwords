@@ -66,6 +66,10 @@
         <Setter Property="Margin" Value="-10,-5,0,-5"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
     </Style>
+    <Style Selector="TextBlock.Clue">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="1"/>
+    </Style>
     <Style Selector="ScrollViewer /template/ ScrollContentPresenter">
         <Setter Property="CanHorizontallyScroll" Value="False"/>
     </Style>

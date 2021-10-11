@@ -82,7 +82,7 @@ module Shell =
             base.Width <- 800.0
             base.Height <- 600.0
             base.MinWidth <- 800.0
-            base.MinHeight <- 600.0
+            base.MinHeight <- 400.0
 
             //this.VisualRoot.VisualRoot.Renderer.DrawFps <- true
             //this.VisualRoot.VisualRoot.Renderer.DrawDirtyRects <- true

@@ -198,6 +198,36 @@ module Puzzle =
         if row<>0 && col<>0 
             && not (checkCell p (row-1,col) FILL_CHAR || checkCell p (row,col-1) FILL_CHAR) then None
         else Some (countNumberedCellsTo p c)
+
+    let calcHighlights (p:Puzzle) (c:Cell) (o:ClueOrientation) : Cell list =
+        // Start with state.selected
+        // Walk left/up to filled cell and add 1
+        // Walk right/down to filled cell and subtract 1
+        // Build list of all the cells between the endpoints (inclusive)
+        let row,col = c
+        let isFillChar letter = (letter = FILL_CHAR)
+        match o with
+        | Across ->
+            let startCol = 
+                match walkTo p isFillChar Leftwards c with
+                | None -> 0
+                | Some (_,x) -> x+1
+            let endCol = 
+                match walkTo p isFillChar Rightwards c with
+                | None -> (getRows p)-1
+                | Some (_,x) -> x-1
+            [for i in [startCol..endCol] -> row,i]
+        | Down ->
+            let startRow = 
+                match walkTo p isFillChar Upwards c with
+                | None -> 0
+                | Some (y,_) -> y+1
+            let endRow = 
+                match walkTo p isFillChar Downwards c with
+                | None -> (getCols p)-1
+                | Some (y,_) -> y-1
+            [for i in [startRow..endRow] -> i,col]
+
         
 /// Functions that operate on CluedPuzzles
 module CluedPuzzle = 
