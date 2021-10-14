@@ -84,6 +84,7 @@ module Solver =
                 let letter = char ((int c) + (int 'A') - (int Key.A)) // Convert Key code to character
                 letter |> SolverMsg.SetCell |> dispatch
             | _ -> () // Do nothing for any other key code
+            keyEvt.Handled <- true
 
 
     //let viewCell (state: State) (dispatch: SolverMsg -> unit) row col letter = 
@@ -119,7 +120,7 @@ module Solver =
                 )
             else
                 Button.isEnabled false
-                Button.background "White"
+                Button.classes ["Filled"]
         ]
 
     let viewClue (state:State) (dispatch: SolverMsg -> unit) (o:ClueOrientation) index = 

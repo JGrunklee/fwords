@@ -34,10 +34,10 @@ module Shell =
             match theme with
             | FwordsTheme.FwordsDark ->
                 state.host.Load "avares://Avalonia.Themes.Default/Accents/BaseDark.xaml"
-                state.host.Load "avares://fwords/Styles.xaml"
+                state.host.Load "avares://fwords/StylesDark.xaml"
             | FwordsTheme.FwordsLight ->
                 state.host.Load "avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"
-                state.host.Load "avares://fwords/Styles.xaml"
+                state.host.Load "avares://fwords/StylesLight.xaml"
             state, Cmd.none
         | SetView view ->
             { state with currentView = view }, Cmd.none
@@ -91,7 +91,7 @@ module Shell =
 
         do
             this.Styles.Load "avares://Avalonia.Themes.Default/Accents/BaseDark.xaml"
-            this.Styles.Load "avares://fwords/Styles.xaml"
+            this.Styles.Load "avares://fwords/StylesDark.xaml"
             
             base.Title <- "fwords 0.0"
             base.Width <- 800.0
