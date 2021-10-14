@@ -5,12 +5,17 @@
 module Types = 
     open fwords.Core
 
+    type FwordsTheme = 
+        | FwordsLight
+        | FwordsDark
+
     /// Messages understood by Lobby module
     type LobbyMsg = 
         | NewRandPuzzle of Difficulty
         | ResumePuzzle
         | ToLibrary
         | JoinOnline
+        | SetTheme of FwordsTheme
 
     /// Messages understood by the Library module
     type LibraryMsg =
@@ -38,6 +43,7 @@ module Types =
 
     /// Messages understood by the Shell module
     type ShellMsg =
+        | SetTheme of FwordsTheme
         | SetView of View
         | LobbyMsg of LobbyMsg
         | LibraryMsg of LibraryMsg

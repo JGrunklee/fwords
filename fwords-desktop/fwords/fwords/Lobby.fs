@@ -25,6 +25,7 @@ module Lobby =
         | NewRandPuzzle level -> state, Cmd.ofMsg (ShellMsg.LobbyMsg LobbyMsg.ToLibrary) // Placeholder
         | ResumePuzzle -> state, Cmd.none // Placeholder
         | JoinOnline -> state, Cmd.none // Placeholder
+        | LobbyMsg.SetTheme theme -> state, theme |> ShellMsg.SetTheme |> Cmd.ofMsg
 
     let view (state: State) (dispatch: LobbyMsg -> unit) =
         DockPanel.create [ 
@@ -83,6 +84,16 @@ module Lobby =
                             Button.content "Join Online"
                             Button.classes ["pretty"]
                             Button.onClick (fun _ -> dispatch JoinOnline)
+                        ]
+                        Button.create [
+                            Button.content "Light"
+                            Button.classes["pretty"]
+                            Button.onClick (fun _ -> FwordsTheme.FwordsLight |> LobbyMsg.SetTheme |> dispatch)
+                        ]
+                        Button.create [
+                            Button.content "Dark"
+                            Button.classes["pretty"]
+                            Button.onClick (fun _ -> FwordsTheme.FwordsDark |> LobbyMsg.SetTheme |> dispatch)
                         ]
                     ]
                 ]

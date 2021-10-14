@@ -20,32 +20,25 @@ module Shell =
     open fwords.Core
 
     type State = {
+        host:Styling.Styles
         currentView: View
         lobbyState: Lobby.State
         libraryState: Library.State
         solverState: Solver.State
     }
 
-    let init =
-        let lobbyState, lbyCmd = Lobby.init
-        let libraryState, libCmd = Library.init
-        //let solverState, slvCmd = Solver.init None None
-        let solverState, slvCmd = Solver.init (Some SampleData.myCluedPuzzle) (Some SampleData.myEmptySolution)
-        {
-            currentView = LobbyView
-            lobbyState = lobbyState
-            libraryState = libraryState
-            solverState = solverState
-        },
-        /// If your children controls don't emit any commands
-        /// in the init function, you can just return Cmd.none
-        /// otherwise, you can use a batch operation on all of them
-        /// you can add more init commands as you need
-        Cmd.batch [ lbyCmd; libCmd; slvCmd ]
-
     let update (msg: ShellMsg) (state: State): State * Cmd<_> =
         // Call child update(s)
         match msg with
+        | SetTheme theme ->
+            match theme with
+            | FwordsTheme.FwordsDark ->
+                state.host.Load "avares://Avalonia.Themes.Default/Accents/BaseDark.xaml"
+                state.host.Load "avares://fwords/Styles.xaml"
+            | FwordsTheme.FwordsLight ->
+                state.host.Load "avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"
+                state.host.Load "avares://fwords/Styles.xaml"
+            state, Cmd.none
         | SetView view ->
             { state with currentView = view }, Cmd.none
         | LobbyMsg lbyMsg ->
@@ -77,7 +70,29 @@ module Shell =
     /// Avalonia
     type MainWindow() as this =
         inherit HostWindow()
+
+        let init =
+            let lobbyState, lbyCmd = Lobby.init
+            let libraryState, libCmd = Library.init
+            //let solverState, slvCmd = Solver.init None None
+            let solverState, slvCmd = Solver.init (Some SampleData.myCluedPuzzle) (Some SampleData.myEmptySolution)
+            {
+                host = base.Styles
+                currentView = LobbyView
+                lobbyState = lobbyState
+                libraryState = libraryState
+                solverState = solverState
+            },
+            /// If your children controls don't emit any commands
+            /// in the init function, you can just return Cmd.none
+            /// otherwise, you can use a batch operation on all of them
+            /// you can add more init commands as you need
+            Cmd.batch [ lbyCmd; libCmd; slvCmd ]
+
         do
+            this.Styles.Load "avares://Avalonia.Themes.Default/Accents/BaseDark.xaml"
+            this.Styles.Load "avares://fwords/Styles.xaml"
+            
             base.Title <- "fwords 0.0"
             base.Width <- 800.0
             base.Height <- 600.0
