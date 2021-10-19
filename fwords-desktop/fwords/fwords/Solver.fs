@@ -95,7 +95,6 @@ module Solver =
             if letter <> Puzzle.FILL_CHAR then
                 Button.classes ["cell"]
                 Button.onTapped (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch) // Apparently SPACE key generates a click event but not a tap event
-                Button.onGotFocus (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch)
                 Button.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt)
 
                 let r,c = state.selected
