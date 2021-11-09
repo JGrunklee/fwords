@@ -22,6 +22,9 @@ module PuzzleTests =
         ['S'; 'E'; 'R'; 'I'; 'E'; 'S'; '#'; 'G'; 'E'; 'E'; '#'; 'A'; 'G'; 'A'; 'R']
     ]
 
+    // An empty CluedPuzzle
+    let myCluelessPuzzle = {puzzle=myPuzzle; down=[]; across=[]}
+
     // This blank puzzle has 6 rows and 5 columns
     let blankPuzzle = array2D [
         [for i in 0..4 -> Puzzle.EMPTY_CHAR]
@@ -63,8 +66,7 @@ module PuzzleTests =
 
             // Navigation
             testCase "walkTo" <| fun _ ->
-                let isFillChar c = (c = Puzzle.FILL_CHAR)
-                let actual = Puzzle.walkTo myPuzzle isFillChar Direction.Rightwards (0,0)
+                let actual = Puzzle.walkUntil Puzzle.checkCellFilled myPuzzle Direction.Rightwards (0,0)
                 Expect.equal actual (Some (0,5)) "Looking for first cell that's filled"
             testCase "getNextCell - no filled cells in the way" <| fun _ -> 
                 let nextEmpty = Puzzle.getNextCell myPuzzle Direction.Rightwards (0,0)
@@ -73,33 +75,33 @@ module PuzzleTests =
                 let nextEmpty = Puzzle.getNextCell myPuzzle Direction.Rightwards (0,4)
                 Expect.equal nextEmpty (Some (0,6)) "Looking for first non-filled cell"
 
-            // Retreiving cross clues
+            // Retreiving across clues
             testCase "getAcrossClueIndex - 0th row anchor" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (0,11)) 2 "Index should be 2."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (0,11)) 2 "Index should be 2."
             testCase "getAcrossClueIndex - 0th row non-anchor" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (0,3)) 0 "Index should be 0."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (0,3)) 0 "Index should be 0."
             testCase "getAcrossClueIndex - 0th row filled cell" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (0,10)) 1 "Index should be 1."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (0,10)) 1 "Index should be 1."
             testCase "getAcrossClueIndex - nth row anchor" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (6,4)) 14 "Index should be 14."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (6,4)) 14 "Index should be 14."
             testCase "getAcrossClueIndex - nth row non-anchor" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (3,12)) 9 "Index should be 9."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (3,12)) 9 "Index should be 9."
             testCase "getAcrossClueIndex - nth row filled cell" <| fun _ ->
-                Expect.equal (Puzzle.getAcrossClueIndex myPuzzle (4,14)) 11 "Index should be 14."
+                Expect.equal (CluedPuzzle.getAcrossClueIndex myCluelessPuzzle (4,14)) 11 "Index should be 14."
 
             // Retreiving down clues
             testCase "getDownClueIndex - 0th row before a filled cell" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (0,1)) 1 "Index should be 1."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (0,1)) 1 "Index should be 1."
             testCase "getDownClueIndex - 0th row after a filled cell" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (0,13)) 11 "Index should be 11."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (0,13)) 11 "Index should be 11."
             testCase "getDownClueIndex - nth row anchor pt 1" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (2,5)) 13 "Index should be 13."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (2,5)) 13 "Index should be 13."
             testCase "getDownClueIndex - nth row anchor pt 2" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (11,14)) 38 "Index should be 38."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (11,14)) 38 "Index should be 38."
             testCase "getDownClueIndex - nth row non-anchor pt 1" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (5,5)) 13 "Index should be 13."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (5,5)) 13 "Index should be 13."
             testCase "getDownClueIndex - nth row non-anchor pt 2" <| fun _ ->
-                Expect.equal (Puzzle.getDownClueIndex myPuzzle (9,0)) 22 "Index should be 22."
+                Expect.equal (CluedPuzzle.getDownClueIndex myCluelessPuzzle (9,0)) 22 "Index should be 22."
 
             // Operations with 2 puzzles
             testCase "deleteMistakes" <| fun _ -> 

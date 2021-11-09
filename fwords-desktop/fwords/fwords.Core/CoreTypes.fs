@@ -13,10 +13,13 @@ module FwordsCoreTypes =
 
     /// An fwords Puzzle is a 2D array of characters.
     /// It may represent a partial or complete solution to a crossword puzzle.
-    type Puzzle =  char[,]
+    type Puzzle = char[,]
 
     /// A Cell holds the coordinates/indices of a square in a Puzzle
     type Cell = int * int
+
+    /// A CellChecker is a function that takes a puzzle and a cell and returns true or false
+    type CellChecker = Puzzle -> Cell -> bool
 
     /// A CluedPuzzle is a Puzzle plus a pair of clue lists
     type CluedPuzzle = {
