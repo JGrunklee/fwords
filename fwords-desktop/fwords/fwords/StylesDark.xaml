@@ -43,6 +43,12 @@
     <Style Selector="Button.cell">
         <Setter Property="Background" Value="Transparent"/>
     </Style>
+    <Style Selector="Button.selected">
+        <Setter Property="Background" Value="#FF3300"/>
+    </Style>
+    <Style Selector="Button.highlighted">
+        <Setter Property="Background" Value="Blue"/>
+    </Style>
     <Style Selector="Button.Filled">
         <Setter Property="Background" Value="White"/>
     </Style>

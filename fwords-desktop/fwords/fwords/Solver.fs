@@ -6,7 +6,6 @@ module Solver =
     open System.Diagnostics
     open System.Runtime.InteropServices
     open Avalonia.Controls
-    open Avalonia.Controls.Primitives
     open Avalonia.Layout
     open Avalonia.Input
     open Avalonia.Media
@@ -48,7 +47,10 @@ module Solver =
                     match Puzzle.getNextCell state.solution.puzzle direction (row,col) with
                     | Some (nrow,ncol) -> nrow,ncol
                     | None -> row,col
-            state, nextCell |> SolverMsg.SelectCell |> ShellMsg.SolverMsg |> Cmd.ofMsg 
+            { state with 
+                selected = nextCell
+                highlighted = Puzzle.calcHighlights state.puzzle.puzzle nextCell state.orientation
+            }, Cmd.none
         | SolverMsg.SetCell letter -> 
             match state.selected with
             | (row,col) -> 
@@ -88,18 +90,15 @@ module Solver =
 
 
     //let viewCell (state: State) (dispatch: SolverMsg -> unit) row col letter = 
-    let viewCell (state:State) (dispatch: SolverMsg -> unit) row col letter = 
-        Button.create [
-            Grid.row row
-            Grid.column col
+    let viewCell (state:State) (dispatch: SolverMsg -> unit) (c:Cell) =
+        let row, col = c
+        let letter = Puzzle.getCell state.solution.puzzle c
+        [
             if letter <> Puzzle.FILL_CHAR then
+                // Ensure Button.classes is first element so we can easily replace after return
                 Button.classes ["cell"]
                 Button.onTapped (fun _ -> (row,col) |> SolverMsg.SelectCell |> dispatch) // Apparently SPACE key generates a click event but not a tap event
                 Button.onKeyDown (fun keyEvt -> cellKeyEventHandler dispatch keyEvt)
-
-                let r,c = state.selected
-                if r=row && c=col then Button.background "Orange"
-                elif List.contains (row,col) state.highlighted then Button.background "Pink"
                 Button.content(
                     DockPanel.create [
                         DockPanel.children [
@@ -118,8 +117,44 @@ module Solver =
                     ]
                 )
             else
-                Button.isEnabled false
+                // Ensure Button.classes is first element so we can easily replace after return
                 Button.classes ["Filled"]
+                Button.isEnabled false
+                
+            Grid.row row
+            Grid.column col
+        ]
+
+    let viewPuzzle (state:State) (dispatch: SolverMsg -> unit) =
+        // Create 2D array of cell (Button) attribute lists
+        let totalRows = Puzzle.getRows state.puzzle.puzzle
+        let totalCols = Puzzle.getCols state.puzzle.puzzle
+        let attrArray = Array2D.init totalRows totalCols <| fun i j -> viewCell state dispatch (i,j)
+
+        // Highlight state.highlighted, looping only once, by replacing first element
+        state.highlighted
+        |> List.iter (fun cell ->
+            let row, col = cell
+            attrArray.[row,col] <- (Button.classes ["highlighted"]) :: List.tail attrArray.[row,col]
+            )
+
+        // Highlight state.selected by replacing first element (Button.classes)
+        try
+            let selRow, selCol = state.selected
+            attrArray.[selRow, selCol] <- (Button.classes ["selected"]) :: List.tail attrArray.[selRow, selCol]
+        with _ -> ()
+
+        // Create parent Grid
+        Grid.create [ // This grid is the actual puzzle
+            Grid.dock Dock.Right
+            Grid.columnDefinitions ([for j in 0..(totalCols-1) -> "33"] |> String.concat ",")
+            Grid.rowDefinitions ([for i in 0..(totalRows-1) -> "33"] |> String.concat ",")
+            Grid.children [
+                // Flatten button attributes array into Grid.children
+                for i in 0..(totalRows-1) do
+                    for j in 0..(totalCols-1) do
+                        yield Button.create attrArray.[i, j]
+            ]
         ]
 
     let viewClue (state:State) (dispatch: SolverMsg -> unit) (o:ClueOrientation) index = 
@@ -206,20 +241,7 @@ module Solver =
                                 StackPanel.create [
                                     Grid.row 1
                                     Grid.column 1
-                                    StackPanel.children [
-                                        Grid.create [ // This grid is the actual puzzle
-                                            Grid.dock Dock.Right
-                                            let rows = Puzzle.getRows state.puzzle.puzzle
-                                            let cols = Puzzle.getCols state.puzzle.puzzle
-                                            Grid.columnDefinitions ([for i in 0..(cols-1) -> "33"] |> String.concat ",")
-                                            Grid.rowDefinitions ([for i in 0..(rows-1) -> "33"] |> String.concat ",")
-                                            Grid.children [
-                                                for i in 0..(rows-1) do
-                                                    for j in 0..(cols-1) do
-                                                        yield viewCell state dispatch i j (Puzzle.getCell state.solution.puzzle (i,j))
-                                            ]
-                                        ]
-                                    ]
+                                    StackPanel.children [ viewPuzzle state dispatch ]
                                 ]
                             ]
                         ]
@@ -261,3 +283,11 @@ module Solver =
                 ]
             ]
         ]
+
+    /// Calls view and prints elasped time
+    let viewTimer state dispatch =
+        let stopWatch = System.Diagnostics.Stopwatch.StartNew()
+        let myView = view state dispatch
+        stopWatch.Stop()
+        printfn "%f" stopWatch.Elapsed.TotalMilliseconds
+        myView
