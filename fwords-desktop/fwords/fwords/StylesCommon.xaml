@@ -1,0 +1,127 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=netstandard">
+
+    <!-- Common resources between all themes -->
+    <Styles.Resources>
+        <sys:Double x:Key="FontSizeTiny">8</sys:Double>
+        <sys:Double x:Key="FontSizeSmall">10</sys:Double>
+        <sys:Double x:Key="FontSizeNormal">12</sys:Double>
+        <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+        <sys:Double x:Key="FontSizeTitle">28</sys:Double>
+
+        <Thickness x:Key="ThemeBorderThickness">1,1,1,1</Thickness>
+
+        <sys:Double x:Key="ScrollBarThickness">18</sys:Double>
+        <sys:Double x:Key="ScrollBarThumbThickness">8</sys:Double>
+    </Styles.Resources>
+
+
+    <!-- TextBlock Styles -->
+    <Style Selector="TextBlock.title">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeTitle}" />
+        <Setter Property="FontWeight" Value="Thin" />
+    </Style>
+    <Style Selector="TextBlock.subtitle">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
+        <Setter Property="FontWeight" Value="Thin" />
+    </Style>
+    <Style Selector="TextBlock.center">
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.list">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}"/>
+        <Setter Property="Margin" Value="1"/>
+    </Style>
+    <Style Selector="TextBlock.emph">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.blue">
+        <Setter Property="Foreground" Value="{DynamicResource FwordsBlue0Brush}"/>
+    </Style>
+    <Style Selector="TextBlock.red">
+        <Setter Property="Foreground" Value="{DynamicResource FwordsRed0Brush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.cell">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    <Style Selector="TextBlock.cellno">
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeTiny}"/>
+        <Setter Property="Margin" Value="-10,-5,0,-5"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+    <Style Selector="TextBlock.flashy">
+        <Style.Animations>
+            <Animation Duration="0:0:7" IterationCount="INFINITE">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0"/>
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="1"/>
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- Button Styles -->
+    <Style Selector="Button.pretty">
+        <Setter Property="Margin" Value="6" />
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue0Brush}"/>
+    </Style>
+    <Style Selector="Button.pretty /template/ ContentPresenter">
+        <Setter Property="CornerRadius" Value="5" />
+    </Style>
+    <Style Selector="Button.pretty:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue1Brush}"/>
+    </Style>
+    <Style Selector="Button.pretty:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue2Brush}"/>
+    </Style>
+    
+    <Style Selector="Button.cell">
+        <Setter Property="Background" Value="{DynamicResource ThemeControlTransparentBrush}"/>
+    </Style>
+    <Style Selector="Button.cell.selected">
+        <Setter Property="Background" Value="{DynamicResource FwordsRed0Brush}"/>
+    </Style>
+    <Style Selector="Button.cell.highlighted">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue0Brush}"/>
+    </Style>
+    <Style Selector="Button.cell.filled">
+        <Setter Property="Background" Value="{DynamicResource ThemeForegroundBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.wide">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    </Style>
+    <Style Selector="Button.list">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue0Brush}"/>
+    </Style>
+    <Style Selector="Button.list:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue1Brush}"/>
+    </Style>
+    <Style Selector="Button.list:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsBlue2Brush}"/>
+    </Style>
+    <Style Selector="Button.list.selected">
+        <Setter Property="Background" Value="{DynamicResource FwordsRed0Brush}"/>
+    </Style>
+    <Style Selector="Button.list.selected:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsRed1Brush}"/>
+    </Style>
+    <Style Selector="Button.list.selected:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource FwordsRed2Brush}"/>
+    </Style>
+    
+    <!-- ScrollViewer Styles -->
+    
+    <Style Selector="ScrollViewer /template/ ScrollContentPresenter">
+        <Setter Property="CanHorizontallyScroll" Value="False"/>
+    </Style>
+</Styles>

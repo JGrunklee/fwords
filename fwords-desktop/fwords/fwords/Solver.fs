@@ -106,11 +106,12 @@ module Solver =
                             | Some num -> 
                                 TextBlock.create [
                                     TextBlock.dock Dock.Top
-                                    TextBlock.classes ["CellNumber"]
+                                    TextBlock.classes ["cellno"]
                                     TextBlock.text (string num)
                                 ]
                             | None -> ()
                             TextBlock.create [
+                                TextBlock.classes ["cell"]
                                 TextBlock.text (string letter)
                             ]
                         ]
@@ -118,7 +119,7 @@ module Solver =
                 )
             else
                 // Ensure Button.classes is first element so we can easily replace after return
-                Button.classes ["Filled"]
+                Button.classes ["cell"; "filled"]
                 Button.isEnabled false
                 
             Grid.row row
@@ -135,13 +136,13 @@ module Solver =
         state.highlighted
         |> List.iter (fun cell ->
             let row, col = cell
-            attrArray.[row,col] <- (Button.classes ["highlighted"]) :: List.tail attrArray.[row,col]
+            attrArray.[row,col] <- (Button.classes ["cell"; "highlighted"]) :: List.tail attrArray.[row,col]
             )
 
         // Highlight state.selected by replacing first element (Button.classes)
         try
             let selRow, selCol = state.selected
-            attrArray.[selRow, selCol] <- (Button.classes ["selected"]) :: List.tail attrArray.[selRow, selCol]
+            attrArray.[selRow, selCol] <- (Button.classes ["cell"; "selected"]) :: List.tail attrArray.[selRow, selCol]
         with _ -> ()
 
         // Create parent Grid
@@ -165,14 +166,14 @@ module Solver =
             Grid.children [
                 TextBlock.create [ // Clue number
                     Grid.column 0
-                    TextBlock.classes ["Clue"; "ClueNumber"]
+                    TextBlock.classes ["list"; "emph"]
                     TextBlock.text (
                         (CluedPuzzle.getClueNumber state.puzzle o index |> string) + ". "
                     )
                 ]
                 TextBlock.create [ // Clue text
                     Grid.column 1
-                    TextBlock.classes ["Clue"]
+                    TextBlock.classes ["list"]
                     TextBlock.textWrapping TextWrapping.Wrap
                     TextBlock.text (
                         match o with
@@ -258,7 +259,7 @@ module Solver =
                                             StackPanel.children [
                                                 yield TextBlock.create [
                                                     TextBlock.text "Across"
-                                                    TextBlock.classes ["subtitle"]
+                                                    TextBlock.classes ["subtitle"; "blue"]
                                                 ]
                                                 for index in [0..(state.puzzle.across.Length-1)] do
                                                     yield viewClue state dispatch Across index
@@ -269,7 +270,7 @@ module Solver =
                                             StackPanel.children [
                                                 yield TextBlock.create [
                                                     TextBlock.text "Down"
-                                                    TextBlock.classes ["subtitle"]
+                                                    TextBlock.classes ["subtitle"; "blue"]
                                                 ]
                                                 for index in [0..(state.puzzle.down.Length-1)] do
                                                     yield viewClue state dispatch Down index

@@ -11,6 +11,7 @@ type App() =
 
     override this.Initialize() =
         this.Styles.Load "avares://Avalonia.Themes.Default/DefaultTheme.xaml"
+        this.Styles.Load "avares://fwords/StylesCommon.xaml"
 
     override this.OnFrameworkInitializationCompleted() =
         match this.ApplicationLifetime with

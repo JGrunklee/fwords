@@ -42,7 +42,7 @@ module Lobby =
                             TextBlock.text ("fwords" )
                         ]
                         TextBlock.create [
-                            TextBlock.classes [ "subtitle" ]
+                            TextBlock.classes [ "subtitle"; "flashy"]
                             TextBlock.textAlignment TextAlignment.Center
                             TextBlock.text ("fun with puzzles and F#")
                         ]
@@ -51,6 +51,7 @@ module Lobby =
                             StackPanel.orientation Orientation.Horizontal
                             StackPanel.children [
                                 TextBlock.create [
+                                    TextBlock.verticalAlignment VerticalAlignment.Center
                                     TextBlock.text "new random puzzle: "
                                 ]
                                 Button.create [

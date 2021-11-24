@@ -55,134 +55,131 @@ module Library =
     //let puzzleSelectorHandler (dispatch: SolverMsg -> unit) TODO
 
     let libraryEntry (state: State) (dispatch: LibraryMsg -> unit) (pi:PuzzleInfo) = 
-        Grid.create [
-            Grid.columnDefinitions "*, *, *" // Three equally-sized columns
-            Grid.rowDefinitions "Auto" // One automatically-sized row
-            Grid.onTapped (fun _ -> dispatch (LibraryMsg.SelectPuzzle pi.id))
-            Grid.children [
-                Border.create[
-                    if pi.id = state.selected then Border.classes["Thick"]
-                    else Border.classes["Normal"]
-                    Grid.column 0
-                    Border.child(
+        Button.create [
+            Button.onTapped (fun _ -> dispatch (LibraryMsg.SelectPuzzle pi.id))
+            ["wide" ; "list"] @ if pi.id = state.selected then ["selected"] else []
+            |> Button.classes
+            
+            Button.content (
+                Grid.create [
+                    Grid.columnDefinitions "*, *, *" // Three equally-sized columns
+                    Grid.rowDefinitions "Auto" // One automatically-sized row
+                    Grid.children [
                         TextBlock.create [
-                            TextBlock.text (
-                                pi.name )
-                            TextBlock.classes["Center"]
+                            Grid.column 0
+                            TextBlock.text pi.name
+                            TextBlock.classes["center" ; "list"]
                         ]
-                    )
-                ]
-                Border.create[
-                    if pi.id = state.selected then Border.classes["Thick"]
-                    else Border.classes["Normal"]
-                    Grid.column 1
-                    Border.child(
                         TextBlock.create [ 
+                            Grid.column 1
                             TextBlock.text (string pi.level)
-                            TextBlock.classes["Center"]
+                            TextBlock.classes["center" ; "list"]
                         ]
-                    )
-                ]
-                Border.create[
-                    if pi.id = state.selected then Border.classes["Thick"]
-                    else Border.classes["Normal"]
-                    Grid.column 2
-                    Border.child(
                         TextBlock.create [
+                            Grid.column 2
                             TextBlock.text (
                                 (pi.progress
                                     |> (*) 100.0
                                     |> string)
                                 + " %"
                             )
-                            TextBlock.classes["Center"]
+                            TextBlock.classes["center" ; "list"]
                         ]
-                    )
+                    ]
                 ]
-            ]
+            )
         ]
+        
 
     let view (state: State) (dispatch: LibraryMsg -> unit) =
         DockPanel.create [
             DockPanel.children [
-                // List of available puzzles
-                ScrollViewer.create [
-                    ScrollViewer.dock Dock.Top
-                    ScrollViewer.content ( 
-                        StackPanel.create [
-                            StackPanel.horizontalAlignment HorizontalAlignment.Stretch
-                            StackPanel.verticalAlignment VerticalAlignment.Stretch
-                            StackPanel.children [
-                                yield Grid.create [
-                                    Grid.columnDefinitions "*, *, *" // Three equally-sized columns
-                                    Grid.rowDefinitions "Auto" // One automatically-sized row
-                                    Grid.children [
-                                        Border.create[
-                                            Border.classes["Normal"]
-                                            Grid.column 0
-                                            Grid.row 0
-                                            Border.child (
-                                                TextBlock.create [
-                                                    TextBlock.text ("Puzzle Title")
-                                                    TextBlock.classes["LibraryTitles"]
-                                                    
-                                                    ]
-                                            )
-                                        ]
-                                        Border.create[
-                                            Border.classes["Normal"]
-                                            Grid.column 1
-                                            Grid.row 0
-                                            Border.child (
-                                                TextBlock.create [
-                                                    TextBlock.text ("Difficulty")
-                                                    TextBlock.classes["LibraryTitles"]
-                                                    
-                                                    ]
-                                            )
-                                        ]
-                                        Border.create[
-                                            Border.classes["Normal"]
-                                            Grid.column 2
-                                            Grid.row 0
-                                            Border.child (
-                                                TextBlock.create [
-                                                    TextBlock.text ("% Complete")
-                                                    TextBlock.classes["LibraryTitles"]
-                                                    
-                                                    ]
-                                            )
-                                        ]
-                                    ]
-                                ]
-                                for item in state.puzzles do
-                                    yield libraryEntry state dispatch item
-                            ]
+                // Header bar
+                DockPanel.create [
+                    DockPanel.dock Dock.Top
+                    DockPanel.children [
+                        Button.create [
+                            Button.dock Dock.Right
+                            Button.classes ["pretty"]
+                            Button.content "Apply Filter"
                         ]
-                    ) // yes, this is the only one that needs to be ')' instead of ']'
+                        Button.create [
+                            Button.dock Dock.Left
+                            Button.classes ["pretty"]
+                            Button.content "Refresh List"
+                        ]
+                        TextBox.create [
+                            TextBox.text "search..."
+                        ]
+                    ]
                 ]
 
                 // Navigation buttons
-                Grid.create [
-                    Grid.dock Dock.Bottom
-                    Grid.verticalAlignment VerticalAlignment.Bottom
-                    Grid.columnDefinitions "Auto, *, Auto"
-                    Grid.rowDefinitions "Auto"
-                    Grid.children [
+                DockPanel.create [
+                    DockPanel.dock Dock.Bottom
+                    DockPanel.children [
                         Button.create [
-                            Grid.column 0
+                            DockPanel.dock Dock.Left
                             Button.content "back"
                             Button.onClick (fun _ -> dispatch LibraryMsg.ToLobby)
                             Button.classes ["pretty"]
                         ]
                         Button.create [
-                            Grid.column 2
+                            DockPanel.dock Dock.Right
                             Button.content "Solve!"
                             Button.onClick (fun _ -> dispatch ToPuzzle)
                             Button.isEnabled (state.selected <> "")
-                            Button.classes ["pretty"]
+                            Button.classes ["list"; "selected"]
+                        ]
+                        // Placeholder to keep the buttons small
+                        TextBlock.create [
+                            TextBlock.text ""
+                        ]
+                    ]
+                ]
+
+                // List of available puzzles
+                Grid.create [
+                    Grid.columnDefinitions "*, *, *, *, *"
+                    Grid.rowDefinitions "Auto, *"
+                    Grid.children [
+                        // Header row
+                        TextBlock.create [
+                            Grid.column 1
+                            Grid.row 0
+                            TextBlock.text ("Title")
+                            TextBlock.classes["title"; "center"]
+                        ]
+                        TextBlock.create [
+                            Grid.column 2
+                            Grid.row 0
+                            TextBlock.text ("Difficulty")
+                            TextBlock.classes["title"; "center"]
+                        ]
+                        TextBlock.create [
+                            Grid.column 3
+                            Grid.row 0
+                            TextBlock.text ("Progress")
+                            TextBlock.classes["title"; "center"]
+                        ]
+                        
+                        // Table
+                        ScrollViewer.create [
+                            Grid.column 1
+                            Grid.columnSpan 3
+                            Grid.row 1
+                            ScrollViewer.content ( 
+                                StackPanel.create [
+                                    StackPanel.horizontalAlignment HorizontalAlignment.Stretch
+                                    StackPanel.children [
+                                        for item in state.puzzles do
+                                            yield libraryEntry state dispatch item
+                                    ]
+                                ]
+                            ) // yes, this is the only one that needs to be ')' instead of ']'
                         ]
                     ]
                 ]
             ]
         ]
+

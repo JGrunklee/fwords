@@ -1,95 +1,75 @@
 <Styles
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=netstandard">
     <Styles.Resources>
-        <Color x:Key="FwordsBlue">#318274</Color>
-        <Color x:Key="FwordsRed">#d7523d</Color>
-        <SolidColorBrush x:Key="FwordsBlueBrush" Color="{DynamicResource FwordsBlue}"></SolidColorBrush>
-        <SolidColorBrush x:Key="FwordsRedBrush" Color="{DynamicResource FwordsRed}"></SolidColorBrush>
-    </Styles.Resources>
+        <!-- Fwords Accent Colors -->
+        <Color x:Key="FwordsBlue0">#318274</Color>
+        <Color x:Key="FwordsBlue1">#2d7569</Color>
+        <Color x:Key="FwordsBlue2">#21574e</Color>
+        
+        <Color x:Key="FwordsRed0">#d7523d</Color>
+        <Color x:Key="FwordsRed1">#b04331</Color>
+        <Color x:Key="FwordsRed2">#803124</Color>
 
-    <Style Selector="WrapPanel.userprofilesgrid">
-        <Setter Property="Margin" Value="24" />
-    </Style>
-    <Style Selector="WrapPanel.userprofile">
-        <Setter Property="Margin" Value="12" />
-        <Setter Property="Height" Value="150" />
-        <Setter Property="Width" Value="350" />
-    </Style>
-    <Style Selector="Image.profileimg">
-        <Setter Property="Height" Value="150" />
-        <Setter Property="Width" Value="150" />
-    </Style>
-    <Style Selector="DockPanel.profilepanel">
-        <Setter Property="Margin" Value="8" />
-    </Style>
-    <Style Selector="TextBlock.title">
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="FontWeight" Value="Thin" />
-    </Style>
-    <Style Selector="TextBlock.subtitle">
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontWeight" Value="Thin" />
-    </Style>
-    <Style Selector="TextBlock.link">
-        <Setter Property="Foreground" Value="#009bde" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="FontStyle" Value="Oblique" />
-    </Style>
-    <Style Selector="TextBlock.link:pointerover">
-        <Setter Property="Foreground" Value="White" />
-    </Style>
-    <Style Selector="Button.pretty">
-        <Setter Property="Margin" Value="6" />
-        <Setter Property="Background" Value="{DynamicResource FwordsBlueBrush}"/>
-    </Style>
-    <Style Selector="Button.pretty:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource FwordsRedBrush}"/>
-    </Style>
-    <Style Selector="Button.pretty /template/ ContentPresenter">
-        <Setter Property="CornerRadius" Value="5" />
-    </Style>
-    <Style Selector="Button.cell">
-        <Setter Property="Background" Value="Transparent"/>
-    </Style>
-    <Style Selector="Button.selected">
-        <Setter Property="Background" Value="{DynamicResource FwordsRedBrush}"/>
-    </Style>
-    <Style Selector="Button.highlighted">
-        <Setter Property="Background" Value="{DynamicResource FwordsBlueBrush}"/>
-    </Style>
-    <Style Selector="Button.Filled">
-        <Setter Property="Background" Value="White"/>
-    </Style>
-    <Style Selector="Border.Normal">
-        <Setter Property="BorderBrush" Value="White" />
-        <Setter Property="BorderThickness" Value="1.0" />
-        <Setter Property="Padding" Value="2.0" />
-    </Style>
-    <Style Selector="Border.Thick">
-        <Setter Property="BorderBrush" Value="White" />
-        <Setter Property="BorderThickness" Value="3.0" />
-        <Setter Property="Padding" Value="2.0" />
-    </Style>
-    <Style Selector="TextBlock.LibraryTitles">
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="FontWeight" Value="Thin" />
-        <Setter Property="TextAlignment" Value="Center" />
-    </Style>
-    <Style Selector="TextBlock.Center">
-        <Setter Property="TextAlignment" Value="Center" />
-    </Style>
-    <Style Selector="TextBlock.CellNumber">
-        <Setter Property="FontSize" Value="7"/>
-        <Setter Property="Margin" Value="-10,-5,0,-5"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-    </Style>
-    <Style Selector="TextBlock.Clue">
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Margin" Value="1"/>
-    </Style>
-    <Style Selector="ScrollViewer /template/ ScrollContentPresenter">
-        <Setter Property="CanHorizontallyScroll" Value="False"/>
-    </Style>
+        <!-- Avalonia Base Colors -->
+        <Color x:Key="ThemeBackgroundColor">#FF282828</Color>
+        <Color x:Key="ThemeBorderLowColor">#FF505050</Color>
+        <Color x:Key="ThemeBorderMidColor">#FF808080</Color>
+        <Color x:Key="ThemeBorderHighColor">#FFA0A0A0</Color>
+        <Color x:Key="ThemeControlLowColor">#FF282828</Color>
+        <Color x:Key="ThemeControlMidColor">#FF505050</Color>
+        <Color x:Key="ThemeControlMidHighColor">#FF686868</Color>
+        <Color x:Key="ThemeControlHighColor">#FF808080</Color>
+        <Color x:Key="ThemeControlVeryHighColor">#FFEFEBEF</Color>
+        <Color x:Key="ThemeControlHighlightLowColor">#FFA8A8A8</Color>
+        <Color x:Key="ThemeControlHighlightMidColor">#FF828282</Color>
+        <Color x:Key="ThemeControlHighlightHighColor">#FF505050</Color>
+        <Color x:Key="ThemeForegroundColor">#FFDEDEDE</Color>
+        <Color x:Key="ThemeForegroundLowColor">#FF808080</Color>
+
+        <Color x:Key="HighlightColor">#FF119EDA</Color>
+        <Color x:Key="HighlightForegroundColor">#FFFFFFFF</Color>
+        <Color x:Key="ErrorColor">#FFFF0000</Color>
+        <Color x:Key="ErrorLowColor">#10FF0000</Color>
+
+        <!-- Additional Theme-specific resources -->
+        <sys:Double x:Key="ThemeDisabledOpacity">0.6</sys:Double>
+        
+        <!-- Brushes boilerplate -->
+        <SolidColorBrush x:Key="FwordsBlue0Brush" Color="{DynamicResource FwordsBlue0}"></SolidColorBrush>
+        <SolidColorBrush x:Key="FwordsBlue1Brush" Color="{DynamicResource FwordsBlue1}"></SolidColorBrush>
+        <SolidColorBrush x:Key="FwordsBlue2Brush" Color="{DynamicResource FwordsBlue2}"></SolidColorBrush>
+        
+        <SolidColorBrush x:Key="FwordsRed0Brush" Color="{DynamicResource FwordsRed0}"></SolidColorBrush>
+        <SolidColorBrush x:Key="FwordsRed1Brush" Color="{DynamicResource FwordsRed1}"></SolidColorBrush>
+        <SolidColorBrush x:Key="FwordsRed2Brush" Color="{DynamicResource FwordsRed2}"></SolidColorBrush>
+
+        <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{DynamicResource ThemeBorderMidColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="{DynamicResource ThemeBorderHighColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlLowBrush" Color="{DynamicResource ThemeControlLowColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlMidBrush" Color="{DynamicResource ThemeControlMidColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlMidHighBrush" Color="{DynamicResource ThemeControlMidHighColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlHighBrush" Color="{DynamicResource ThemeControlHighColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlVeryHighBrush" Color="{DynamicResource ThemeControlVeryHighColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="{DynamicResource ThemeControlHighlightLowColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="{DynamicResource ThemeControlHighlightMidColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="{DynamicResource ThemeControlHighlightHighColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="{DynamicResource ThemeForegroundColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="{DynamicResource ThemeForegroundLowColor}"></SolidColorBrush>
+
+        <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource HighlightColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="HighlightForegroundBrush" Color="{DynamicResource HighlightForegroundColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush" Color="{DynamicResource ThemeAccentColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush2" Color="{DynamicResource ThemeAccentColor2}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush3" Color="{DynamicResource ThemeAccentColor3}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ThemeAccentBrush4" Color="{DynamicResource ThemeAccentColor4}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource ErrorColor}"></SolidColorBrush>
+        <SolidColorBrush x:Key="ErrorLowBrush" Color="{DynamicResource ErrorLowColor}"></SolidColorBrush>
+
+        <SolidColorBrush x:Key="ThemeControlTransparentBrush" Color="Transparent" />
+
+    </Styles.Resources>
 </Styles>

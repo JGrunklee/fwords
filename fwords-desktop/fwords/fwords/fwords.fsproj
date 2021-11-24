@@ -9,8 +9,6 @@
       <PackageReference Update="FSharp.Core" Version="5.0.2" />
     </ItemGroup>
     <ItemGroup>
-      <AvaloniaResource Include="StylesLight.xaml" />
-      <AvaloniaResource Include="StylesDark.xaml" />
       <Compile Include="Types.fs" />
       <Compile Include="Library.fs" />
       <Compile Include="Lobby.fs" />
