@@ -120,8 +120,9 @@
     </Style>
     
     <!-- ScrollViewer Styles -->
-    
+
     <Style Selector="ScrollViewer /template/ ScrollContentPresenter">
         <Setter Property="CanHorizontallyScroll" Value="False"/>
     </Style>
+
 </Styles>

@@ -18,6 +18,12 @@ module Array2D =
         myarray
         |> Seq.cast<'T>
         |> Seq.reduce reduction
+
+    /// https://stackoverflow.com/questions/37842353/f-converting-array2d-to-array-of-arrays
+    let toJagged<'a> (arr: 'a[,]) : 'a [] [] = 
+        [| for x in 0 .. Array2D.length1 arr - 1 do
+                yield [| for y in 0 .. Array2D.length2 arr - 1 -> arr.[x, y] |]
+            |]
         
 
 /// Functions that operate on one or more Puzzle types.

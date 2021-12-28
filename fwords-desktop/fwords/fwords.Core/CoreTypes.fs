@@ -2,6 +2,7 @@
 
 [<AutoOpen>]
 module FwordsCoreTypes = 
+
     /// Enumerate the directions that we might want to move through Puzzles
     type Direction = | Upwards | Downwards | Leftwards | Rightwards
 
@@ -14,7 +15,7 @@ module FwordsCoreTypes =
     /// An fwords Puzzle is a 2D array of characters.
     /// It may represent a partial or complete solution to a crossword puzzle.
     type Puzzle = char[,]
-
+        
     /// A Cell holds the coordinates/indices of a square in a Puzzle
     type Cell = int * int
 
@@ -41,3 +42,4 @@ module FwordsCoreTypes =
         level: Difficulty
         progress: float
     }
+
