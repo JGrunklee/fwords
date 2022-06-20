@@ -1,31 +1,5 @@
 namespace fwords.Core
 
-/// Add helpful extensions to F# standard Array2D module.
-module Array2D = 
-    /// Split a 2D array into a list of its columns.
-    let columwise myarray = 
-        let numCols = Array2D.length2 myarray
-        [for col in 0..numCols-1 -> myarray.[*,col]]
-
-    /// Apply a function to every member of a 2D array and sum the results.
-    let sumBy (projection:'T -> 'U) myarray = 
-        myarray
-        |> Seq.cast<'T>
-        |> Seq.sumBy projection
-
-    /// Reduce all the members of a 2D array by a function.
-    let reduce (reduction: 'T->'T->'T) myarray =
-        myarray
-        |> Seq.cast<'T>
-        |> Seq.reduce reduction
-
-    /// https://stackoverflow.com/questions/37842353/f-converting-array2d-to-array-of-arrays
-    let toJagged<'a> (arr: 'a[,]) : 'a [] [] = 
-        [| for x in 0 .. Array2D.length1 arr - 1 do
-                yield [| for y in 0 .. Array2D.length2 arr - 1 -> arr.[x, y] |]
-            |]
-        
-
 /// Functions that operate on one or more Puzzle types.
 module Puzzle = 
 

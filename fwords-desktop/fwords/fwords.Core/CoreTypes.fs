@@ -2,6 +2,7 @@
 
 [<AutoOpen>]
 module FwordsCoreTypes = 
+    open FSharp.Json
 
     /// Enumerate the directions that we might want to move through Puzzles
     type Direction = | Upwards | Downwards | Leftwards | Rightwards
@@ -24,6 +25,7 @@ module FwordsCoreTypes =
 
     /// A CluedPuzzle is a Puzzle plus a pair of clue lists
     type CluedPuzzle = {
+        [<JsonField(Transform=typeof<Array2DJson.Array2DJagged<char>>)>]
         puzzle: Puzzle
         across: string list     // The across clues
         down: string list       // The down clues
@@ -31,6 +33,7 @@ module FwordsCoreTypes =
 
     /// A Solution represents a partially-solved crossword puzzle
     type Solution = {
+        [<JsonField(Transform=typeof<Array2DJson.Array2DJagged<char>>)>]
         puzzle: Puzzle        // The partial response
         progress: float         // Percentage of the puzzle completed correctly
     }
